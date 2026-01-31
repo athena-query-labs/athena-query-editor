@@ -145,6 +145,15 @@ export class ViewerStateManager {
         this.notifyStateUpdate()
     }
 
+    public setExpanded(path: string, expanded: boolean) {
+        if (expanded) {
+            this.userExpanded.add(path)
+        } else {
+            this.userExpanded.delete(path)
+        }
+        this.notifyStateUpdate()
+    }
+
     public isVisible(path: string): boolean {
         if (!this.isSearching) {
             // In manual mode, must have all parents expanded
