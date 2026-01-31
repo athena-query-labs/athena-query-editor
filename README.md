@@ -1,12 +1,11 @@
-# Trino Query UI
+# Trino Query UI (Athena backend)
 
-A reusable React component as a query interface for the SQL query engine
-[Trino](https://trino.io/). Browse connected catalogs, write SQL queries,
-execute the queries and inspect result data all in a web application connected
-to your Trino cluster.
+A reusable React component as a query interface for SQL query engines.
+This repository now includes an AWS Athena backend service (in `server/`)
+and a frontend adapted to Athena APIs.
 
 The component can be embedded into any React application and configured to proxy
-requests to a local or remote Trino cluster.
+requests to a local or remote Athena backend.
 
 > [!WARNING]
 > This package is under heavy development and is not yet recommended for
@@ -14,6 +13,27 @@ requests to a local or remote Trino cluster.
 > production-ready builds and documentation are planned.
 
 ![Trino Query UI](screenshot.png "Trino Query UI")
+
+## Athena backend (server/)
+
+The Athena backend is an Express + TypeScript service under `server/`.
+It expects an auth proxy (e.g. oauth2-proxy) to inject `X-Email` on all requests.
+
+Required environment variables:
+
+```
+AWS_REGION
+ATHENA_WORKGROUP
+ATHENA_OUTPUT_LOCATION
+```
+
+Optional:
+
+```
+ATHENA_DEFAULT_CATALOG=AwsDataCatalog
+ATHENA_DEFAULT_DATABASE=
+ATHENA_PRICING_FILE=config/athena-pricing.json
+```
 
 Implementation details:
 

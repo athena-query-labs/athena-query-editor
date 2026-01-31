@@ -1,0 +1,23 @@
+{
+  "currency": "USD",
+  "defaultPricePerTB": 5.0,
+  "billing": {
+    "rounding": "nearestMB",
+    "minimumMB": 10
+  },
+  "regionOverrides": {
+    "cn-north-1": {
+      "currency": "CNY",
+      "pricePerTB": 41.2
+    },
+    "cn-northwest-1": {
+      "currency": "CNY",
+      "pricePerTB": 34.34
+    }
+  },
+  "sources": [
+    "https://aws.amazon.com/athena/pricing/",
+    "https://docs.aws.amazon.com/whitepapers/latest/big-data-analytics-options/amazon-athena.html",
+    "https://www.amazonaws.cn/en/athena/pricing/"
+  ]
+}

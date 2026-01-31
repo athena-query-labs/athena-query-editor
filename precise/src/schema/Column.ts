@@ -1,4 +1,4 @@
-import TrinoQueryRunner from '../AsyncTrinoClient'
+import AthenaQueryRunner from '../AsyncAthenaClient'
 
 class Column {
     private name: string
@@ -37,7 +37,7 @@ class Column {
 
     getSampleValues(TableRef: any, callback: any) {
         // get sample values for this column
-        new TrinoQueryRunner()
+        new AthenaQueryRunner()
             .SetAllResultsCallback((results: any[]) => {
                 this.sampleValues = []
                 for (let i = 0; i < results.length; i++) {
