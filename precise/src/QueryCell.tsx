@@ -170,6 +170,16 @@ class QueryCell extends React.Component<QueryCellProps, QueryCellState> {
     }
 
     Execute() {
+        const isQueryRunning =
+            this.state.runningQuery !== undefined &&
+            this.state.response.state !== undefined &&
+            (this.state.response.state === 'RUNNING' || this.state.response.state === 'QUEUED')
+
+        if (isQueryRunning) {
+            this.queryRunner.CancelQuery('Query cancelled')
+            return
+        }
+
         this.queryRunner.StartQuery(
             this.state.currentQuery.query,
             this.state.currentQuery.catalog,

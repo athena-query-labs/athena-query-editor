@@ -2,6 +2,7 @@ class AthenaQueryRunner {
     private queryId: string | null = null
     private isRunning: boolean = false
     private cancellationRequested: boolean = false
+    private pendingStart: { statement: string; catalog?: string; database?: string } | null = null
     private resultsPages: any[] = []
     private columns: any[] = []
     private rowsRead: number = 0
@@ -50,7 +51,10 @@ class AthenaQueryRunner {
 
     async StartQuery(statement: string, catalog?: string, database?: string) {
         if (this.isRunning) {
-            this.CancelQuery('')
+            this.pendingStart = { statement, catalog, database }
+            if (!this.cancellationRequested) {
+                this.CancelQuery('')
+            }
             return
         }
 
@@ -93,15 +97,21 @@ class AthenaQueryRunner {
             if (state === 'SUCCEEDED') {
                 await this.fetchAllResults()
                 this.isRunning = false
+                this.cancellationRequested = false
+                this.queryId = null
                 this.SetStopped()
+                this.startPendingIfAny()
                 return
             }
             if (state === 'FAILED' || state === 'CANCELLED' || state === 'TIMEOUT') {
                 this.isRunning = false
+                this.cancellationRequested = false
+                this.queryId = null
                 this.SetStopped()
                 if (status.statusReason) {
                     this.setErrorMessage(status.statusReason)
                 }
+                this.startPendingIfAny()
                 return
             }
 
@@ -109,8 +119,18 @@ class AthenaQueryRunner {
         } catch (error) {
             this.setErrorMessage(error instanceof Error ? error.message : 'Failed to poll status')
             this.isRunning = false
+            this.cancellationRequested = false
+            this.queryId = null
             this.SetStopped()
+            this.startPendingIfAny()
         }
+    }
+
+    private startPendingIfAny() {
+        if (!this.pendingStart) return
+        const pending = this.pendingStart
+        this.pendingStart = null
+        void this.StartQuery(pending.statement, pending.catalog, pending.database)
     }
 
     private async fetchAllResults() {
