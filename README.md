@@ -41,6 +41,12 @@ Frontend dev (Vite) header injection:
 VITE_DEV_USER_EMAIL=you@example.com
 ```
 
+Backend smoke test (server must be running):
+
+```
+SMOKE_BASE_URL=http://localhost:8081 SMOKE_USER_EMAIL=you@example.com npm run test:smoke
+```
+
 Implementation details:
 
 * React TypeScript project with Vite

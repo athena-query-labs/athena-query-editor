@@ -69,3 +69,11 @@ Apply `migrations/001_create_query_history.sql` to provision query history stora
 npm install
 npm run dev
 ```
+
+## Smoke test
+
+Run with a live server:
+
+```
+SMOKE_BASE_URL=http://localhost:8081 SMOKE_USER_EMAIL=you@example.com npm run test:smoke
+```
