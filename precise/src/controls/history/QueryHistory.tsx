@@ -246,6 +246,8 @@ const QueryHistory: React.FC<QueryHistoryProps> = ({ onSelectQuery }) => {
                                     )}
                                 </Box>
                             }
+                            primaryTypographyProps={{ component: 'div' }}
+                            secondaryTypographyProps={{ component: 'div' }}
                         />
                     </ListItem>
                 ))}

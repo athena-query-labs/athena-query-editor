@@ -85,13 +85,11 @@ export const QueryEditor = ({ height, theme, enableCatalogSearchColumns }: IQuer
     const muiThemeToUse = () => {
         if (theme === 'dark') {
             return darkTheme
-        } else if (theme === 'light') {
-            return lightTheme
-        } else if (prefersDarkMode) {
-            return darkTheme
-        } else {
+        }
+        if (theme === 'light') {
             return lightTheme
         }
+        return prefersDarkMode ? darkTheme : lightTheme
     }
 
     const applyQueryUpdates = (updates: Partial<QueryInfo>) => {
@@ -216,7 +214,13 @@ export const QueryEditor = ({ height, theme, enableCatalogSearchColumns }: IQuer
                         drawerOpen={drawerOpen}
                         height={height}
                         onDrawerToggle={() => setDrawerOpen(true)}
-                        theme={theme}
+                        themeMode={
+                            theme === 'dark' || theme === 'light'
+                                ? theme
+                                : prefersDarkMode
+                                  ? 'dark'
+                                  : 'light'
+                        }
                     />
                 </Main>
             </Box>
