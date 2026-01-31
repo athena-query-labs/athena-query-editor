@@ -238,8 +238,28 @@ class QueryEditorPane extends React.Component<QueryEditorPaneProps, QueryEditorP
     // Takes the editor and parses the text, then decorates the editor with errors, autocomplete, and special syntax highlighting
     parseAndDecoratePromise(monaco: any, editor: any, lastUpdateCounter: number): boolean {
         const newValue: string = editor.getValue()
-        const lines: string[] = newValue.split('\n')
+        if (newValue.trim().length === 0) {
+            const model = editor.getModel()
+            if (model) {
+                monaco.editor.setModelMarkers(model, 'owner', [])
+            }
+            if (this.decorations) {
+                this.decorations.clear()
+            }
+            this.decorations = editor.createDecorationsCollection([])
+            return true
+        }
         const caretPosition: monaco.Position = editor.getPosition()
+        const lines: string[] = newValue.split('\n')
+        let parseValue = newValue
+        if (
+            /;\s*$/.test(newValue) &&
+            caretPosition.lineNumber === lines.length &&
+            caretPosition.column >= lines[lines.length - 1].length
+        ) {
+            parseValue = newValue.replace(/;\s*$/, '')
+        }
+        const parseLines: string[] = parseValue.split('\n')
 
         // Gather information about the cursor position
         let currentWord = ''
@@ -271,7 +291,7 @@ class QueryEditorPane extends React.Component<QueryEditorPaneProps, QueryEditorP
             endWord = i
         }
 
-        const inputStream = CharStream.fromString(newValue)
+        const inputStream = CharStream.fromString(parseValue)
         const lexer = new SqlBaseLexer(inputStream)
         const tokenStream = new CommonTokenStream(lexer)
         const parser = new SqlBaseParser(tokenStream)
@@ -296,14 +316,18 @@ class QueryEditorPane extends React.Component<QueryEditorPaneProps, QueryEditorP
         if (statements.length == 0 && currentTreePosition == undefined) {
             // reconstruct input inserting an underscore at the cursor position
             const phantomKeyword: string = 'i'
+            const parseLine = parseLines[caretPosition.lineNumber - 1] ?? ''
+            const caretColumn = Math.min(caretPosition.column, parseLine.length + 1)
             const newLine =
-                currentLine.substring(0, caretPosition.column - 1) +
+                parseLine.substring(0, caretColumn - 1) +
                 phantomKeyword +
-                currentLine.substring(caretPosition.column - 1)
+                parseLine.substring(caretColumn - 1)
             const newText =
-                lines.slice(0, caretPosition.lineNumber - 1).join('\n') +
+                parseLines.slice(0, caretPosition.lineNumber - 1).join('\n') +
                 newLine +
-                (lines.length > caretPosition.lineNumber ? '\n' + lines.slice(caretPosition.lineNumber).join('\n') : '')
+                (parseLines.length > caretPosition.lineNumber
+                    ? '\n' + parseLines.slice(caretPosition.lineNumber).join('\n')
+                    : '')
 
             const inputStreamWithChar = CharStream.fromString(newText)
             const lexerWithChar = new SqlBaseLexer(inputStreamWithChar)
