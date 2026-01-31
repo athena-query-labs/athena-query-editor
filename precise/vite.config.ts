@@ -1,14 +1,14 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
-// Used for local debugging against Trino also running on localhost at port 8080:
+// Used for local debugging against the Athena backend running on localhost at port 8081:
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
   server: {
     proxy: {
-      '/v1': {
-        target: 'http://localhost:8080',
+      '/api': {
+        target: 'http://localhost:8081',
         changeOrigin: true,
         secure: false,
       },
