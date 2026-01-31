@@ -92,20 +92,7 @@ class SchemaProvider {
                     const databases = dbData.databases ?? []
 
                     for (const databaseName of databases) {
-                        const schema = catalog.getOrAdd(new Schema(databaseName))
-                        const tablesResponse = await fetch(
-                            `/api/metadata/tables?database=${encodeURIComponent(databaseName)}`
-                        )
-                        if (!tablesResponse.ok) {
-                            throw new Error(await tablesResponse.text())
-                        }
-                        const tablesData = await tablesResponse.json()
-                        const tables = tablesData.tables ?? []
-                        for (const tableName of tables) {
-                            const table = new Table(tableName)
-                            schema.addTable(table)
-                            this.tables.set(`${catalogName}.${databaseName}.${tableName}`, table)
-                        }
+                        catalog.getOrAdd(new Schema(databaseName))
                     }
                 }
 
@@ -116,6 +103,39 @@ class SchemaProvider {
                 this.lastSchemaFetchError = error.toString()
                 errorCallback?.(error.toString())
             })
+    }
+
+    static async loadTablesForDatabase(
+        catalogName: string,
+        databaseName: string,
+        callback: ((nextCatalogs: Map<string, Catalog>) => void) | null = null,
+        errorCallback: ((error: string) => void) | null = null
+    ) {
+        try {
+            const tablesResponse = await fetch(`/api/metadata/tables?database=${encodeURIComponent(databaseName)}`)
+            if (!tablesResponse.ok) {
+                throw new Error(await tablesResponse.text())
+            }
+            const tablesData = await tablesResponse.json()
+            const tables = tablesData.tables ?? []
+
+            const catalog = this.catalogs.get(catalogName)
+            if (!catalog) {
+                throw new Error(`Catalog not found: ${catalogName}`)
+            }
+            const schema = catalog.getOrAdd(new Schema(databaseName))
+
+            for (const tableName of tables) {
+                if (!schema.getTables().has(tableName)) {
+                    const table = new Table(tableName)
+                    schema.addTable(table)
+                    this.tables.set(`${catalogName}.${databaseName}.${tableName}`, table)
+                }
+            }
+            callback?.(new Map(this.catalogs))
+        } catch (error) {
+            errorCallback?.(error instanceof Error ? error.message : String(error))
+        }
     }
 
     /* callback returns a table type */

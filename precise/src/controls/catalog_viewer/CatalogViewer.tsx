@@ -115,8 +115,21 @@ const CatalogViewer: React.FC<CatalogViewerProps> = ({
         // Toggle the expansion state
         viewerState.current.toggleExpanded(path)
 
-        // If it's a table path, ensure data is loaded
+        // If it's a database path, lazy load tables
         const pathParts = path.split('.')
+        if (pathParts.length === 2) {
+            const catalogName = pathParts[0]
+            const databaseName = pathParts[1]
+            await SchemaProvider.loadTablesForDatabase(
+                catalogName,
+                databaseName,
+                (nextCatalogs) => setCatalogs(nextCatalogs),
+                (error: string) => setErrorMessage(error)
+            )
+            return
+        }
+
+        // If it's a table path, ensure data is loaded
         if (pathParts.length === 3) {
             const tableRef = new TableReference(pathParts[0], pathParts[1], pathParts[2])
 
