@@ -114,10 +114,11 @@ const CatalogViewer: React.FC<CatalogViewerProps> = ({
 
         // Toggle the expansion state
         viewerState.current.toggleExpanded(path)
+        const isExpandedNow = viewerState.current.isExpanded(path)
 
         // If it's a database path, lazy load tables
         const pathParts = path.split('.')
-        if (pathParts.length === 2) {
+        if (pathParts.length === 2 && isExpandedNow) {
             const catalogName = pathParts[0]
             const databaseName = pathParts[1]
             await SchemaProvider.loadTablesForDatabase(
@@ -141,7 +142,12 @@ const CatalogViewer: React.FC<CatalogViewerProps> = ({
         }
     }
 
+    const hasLoaded = useRef(false)
     useEffect(() => {
+        if (hasLoaded.current) {
+            return
+        }
+        hasLoaded.current = true
         loadCatalogs()
     }, [loadCatalogs])
 

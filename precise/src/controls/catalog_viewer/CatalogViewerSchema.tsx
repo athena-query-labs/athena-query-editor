@@ -47,6 +47,10 @@ const CatalogViewerSchema: React.FC<SchemaProps> = ({
         }
     }
 
+    const tables = Array.from(schema.getTables().values()).sort((a: Table, b: Table) =>
+        a.getName().localeCompare(b.getName())
+    )
+
     return (
         <TreeItem
             key={schemaPath}
@@ -83,9 +87,13 @@ const CatalogViewerSchema: React.FC<SchemaProps> = ({
                 },
             }}
         >
-            {Array.from(schema.getTables().values())
-                .sort((a: Table, b: Table) => a.getName().localeCompare(b.getName()))
-                .map((table: Table) => {
+            {tables.length === 0 ? (
+                <TreeItem
+                    itemId={`${schemaPath}.__loading`}
+                    label={<Typography fontSize="small" color="text.secondary">Click to load tables</Typography>}
+                />
+            ) : (
+                tables.map((table: Table) => {
                     const tablePath = buildPath.table(catalogName, schema.getName(), table.getName())
 
                     return (
@@ -100,7 +108,8 @@ const CatalogViewerSchema: React.FC<SchemaProps> = ({
                             onGenerateQuery={onGenerateQuery}
                         />
                     )
-                })}
+                })
+            )}
         </TreeItem>
     )
 }

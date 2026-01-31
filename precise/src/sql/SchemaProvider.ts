@@ -11,6 +11,9 @@ class SchemaProvider {
     static catalogs: Map<string, Catalog> = new Map<string, Catalog>()
     // map of fully qualified table name to tables
     static tables: Map<string, Table> = new Map<string, Table>()
+    static loadedSchemas: Set<string> = new Set()
+    static loadingSchemas: Set<string> = new Set()
+    static loadingCatalogs: boolean = false
 
     static getTableNameList(catalogFilter: string | undefined, schemaFilter: string | undefined): string[] {
         // get list from catalogs, because tables may not be resolved
@@ -66,6 +69,14 @@ class SchemaProvider {
         callback: ((nextCatalogs: Map<string, Catalog>) => void) | null = null,
         errorCallback: ((error: string) => void) | null = null
     ) {
+        if (this.catalogs.size > 0) {
+            callback?.(new Map(this.catalogs))
+            return
+        }
+        if (this.loadingCatalogs) {
+            return
+        }
+        this.loadingCatalogs = true
         Promise.resolve()
             .then(async () => {
                 const catalogResponse = await fetch('/api/metadata/catalogs')
@@ -103,6 +114,9 @@ class SchemaProvider {
                 this.lastSchemaFetchError = error.toString()
                 errorCallback?.(error.toString())
             })
+            .finally(() => {
+                this.loadingCatalogs = false
+            })
     }
 
     static async loadTablesForDatabase(
@@ -111,6 +125,12 @@ class SchemaProvider {
         callback: ((nextCatalogs: Map<string, Catalog>) => void) | null = null,
         errorCallback: ((error: string) => void) | null = null
     ) {
+        const key = `${catalogName}.${databaseName}`
+        if (this.loadedSchemas.has(key) || this.loadingSchemas.has(key)) {
+            callback?.(new Map(this.catalogs))
+            return
+        }
+        this.loadingSchemas.add(key)
         try {
             const tablesResponse = await fetch(`/api/metadata/tables?database=${encodeURIComponent(databaseName)}`)
             if (!tablesResponse.ok) {
@@ -132,9 +152,12 @@ class SchemaProvider {
                     this.tables.set(`${catalogName}.${databaseName}.${tableName}`, table)
                 }
             }
+            this.loadedSchemas.add(key)
             callback?.(new Map(this.catalogs))
         } catch (error) {
             errorCallback?.(error instanceof Error ? error.message : String(error))
+        } finally {
+            this.loadingSchemas.delete(key)
         }
     }
 
