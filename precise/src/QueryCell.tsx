@@ -57,10 +57,6 @@ class QueryCell extends React.Component<QueryCellProps, QueryCellState> {
         if (!this.state.currentQuery.catalog) {
             this.props.queries.updateQuery(this.state.currentQuery.id, { catalog: 'AwsDataCatalog' })
         }
-        const current = this.props.queries.getCurrentQuery()
-        if (current.schema && current.catalog) {
-            this.loadTablesForSchema(current.catalog, current.schema)
-        }
         this.queryRunner = new AsyncAthenaClient()
         this.setupQueryRunner()
     }
