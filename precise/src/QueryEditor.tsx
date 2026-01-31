@@ -10,6 +10,7 @@ import Queries from './schema/Queries'
 import QueryInfo from './schema/QueryInfo'
 import CatalogViewer from './controls/catalog_viewer/CatalogViewer'
 import QueryHistory from './controls/history/QueryHistory'
+import { Tabs, Tab } from '@mui/material'
 
 interface IQueryEditor {
     height: number
@@ -77,6 +78,7 @@ export const QueryEditor = ({ height, theme, enableCatalogSearchColumns }: IQuer
     const [drawerOpen, setDrawerOpen] = useState<boolean>(true)
     const [queryRunning, setQueryRunning] = useState<boolean>(false)
     const [currentQuery, setCurrentQuery] = useState<QueryInfo>(queries.getCurrentQuery())
+    const [drawerTab, setDrawerTab] = useState<'catalog' | 'history'>('catalog')
     const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)')
     const containerRef = useRef(null)
 
@@ -184,13 +186,25 @@ export const QueryEditor = ({ height, theme, enableCatalogSearchColumns }: IQuer
                         },
                     }}
                 >
-                    <QueryHistory onSelectQuery={setQueryContent} />
-                    <CatalogViewer
-                        onGenerateQuery={setQueryContent}
-                        onAppendQuery={appendQueryContent}
-                        onDrawerToggle={() => setDrawerOpen(false)}
-                        enableSearchColumns={enableCatalogSearchColumns}
-                    />
+                    <Tabs
+                        value={drawerTab}
+                        onChange={(_, value) => setDrawerTab(value)}
+                        variant="fullWidth"
+                        sx={{ borderBottom: 1, borderColor: 'divider' }}
+                    >
+                        <Tab value="catalog" label="Catalog" />
+                        <Tab value="history" label="History" />
+                    </Tabs>
+                    {drawerTab === 'history' ? (
+                        <QueryHistory onSelectQuery={setQueryContent} />
+                    ) : (
+                        <CatalogViewer
+                            onGenerateQuery={setQueryContent}
+                            onAppendQuery={appendQueryContent}
+                            onDrawerToggle={() => setDrawerOpen(false)}
+                            enableSearchColumns={enableCatalogSearchColumns}
+                        />
+                    )}
                 </Drawer>
 
                 <Main open={drawerOpen} sx={{ p: 0 }}>
