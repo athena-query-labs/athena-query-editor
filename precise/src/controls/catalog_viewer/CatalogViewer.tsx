@@ -96,6 +96,13 @@ const CatalogViewer: React.FC<CatalogViewerProps> = ({
             await SchemaProvider.populateCatalogsAndRefreshTableList(
                 (nextCatalogs) => {
                     setCatalogs(nextCatalogs)
+                    if (viewerState.current) {
+                        Array.from(nextCatalogs.keys()).forEach((catalogName) => {
+                            if (!viewerState.current?.isExpanded(catalogName)) {
+                                viewerState.current?.toggleExpanded(catalogName)
+                            }
+                        })
+                    }
                     setIsLoading(false)
                 },
                 (error: string) => {
