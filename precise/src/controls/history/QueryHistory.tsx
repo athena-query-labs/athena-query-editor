@@ -68,7 +68,7 @@ const QueryHistory: React.FC<QueryHistoryProps> = ({ onSelectQuery }) => {
     }, [])
 
     return (
-        <Box sx={{ px: 1, pt: 1 }}>
+        <Box sx={{ px: 1, pt: 1, display: 'flex', flexDirection: 'column', height: '100%' }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                 <Typography variant="subtitle2">Query History</Typography>
                 <Box sx={{ ml: 'auto', display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -80,20 +80,27 @@ const QueryHistory: React.FC<QueryHistoryProps> = ({ onSelectQuery }) => {
                     </Tooltip>
                 </Box>
             </Box>
-            <List dense sx={{ maxHeight: 180, overflowY: 'auto' }}>
+            <List dense sx={{ flex: 1, minHeight: 240, overflowY: 'auto' }}>
                 {items.map((item) => (
                     <ListItem
                         key={item.query_execution_id}
                         onClick={() => onSelectQuery(item.sql_text, item.catalog, item.database_name)}
-                        sx={{ cursor: 'pointer' }}
+                        sx={{ cursor: 'pointer', py: 0.5 }}
                     >
                         <ListItemText
                             primary={
                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                    <Chip size="small" label={item.status} color={statusColor[item.status] || 'default'} />
-                                    <Typography variant="caption" noWrap sx={{ maxWidth: 140 }}>
-                                        {item.sql_text}
-                                    </Typography>
+                                    <Chip
+                                        size="small"
+                                        variant="outlined"
+                                        label={item.status}
+                                        color={statusColor[item.status] || 'default'}
+                                    />
+                                    <Tooltip title={<Typography variant="caption">{item.sql_text}</Typography>} placement="right">
+                                        <Typography variant="caption" noWrap sx={{ maxWidth: 180 }}>
+                                            {item.sql_text}
+                                        </Typography>
+                                    </Tooltip>
                                 </Box>
                             }
                             secondary={
