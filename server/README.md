@@ -94,3 +94,5 @@ SMOKE_CANCEL_QUERY="SELECT * FROM default.cashfury_ods LIMIT 100000" \
   SMOKE_USER_EMAIL=you@example.com \
   npm run test:query
 ```
+
+You can also set `SMOKE_CANCEL_QUERY` in `server/.env` for local runs.
