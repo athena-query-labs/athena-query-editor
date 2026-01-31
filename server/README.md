@@ -77,3 +77,20 @@ Run with a live server:
 ```
 SMOKE_BASE_URL=http://localhost:8081 SMOKE_USER_EMAIL=you@example.com npm run test:smoke
 ```
+
+## Query lifecycle test
+
+Requires a running server and Athena access:
+
+```
+SMOKE_BASE_URL=http://localhost:8081 SMOKE_USER_EMAIL=you@example.com npm run test:query
+```
+
+Optional cancel test:
+
+```
+SMOKE_CANCEL_QUERY="SELECT * FROM default.cashfury_ods LIMIT 100000" \
+  SMOKE_BASE_URL=http://localhost:8081 \
+  SMOKE_USER_EMAIL=you@example.com \
+  npm run test:query
+```
