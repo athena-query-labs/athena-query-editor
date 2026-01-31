@@ -12,6 +12,7 @@ import ResultSet from './ResultSet'
 import Queries from './schema/Queries'
 import QueryInfo from './schema/QueryInfo'
 import AsyncAthenaClient from './AsyncAthenaClient'
+import SchemaProvider from './sql/SchemaProvider'
 
 const TOOLBAR_HEIGHT = 64
 
@@ -55,6 +56,10 @@ class QueryCell extends React.Component<QueryCellProps, QueryCellState> {
         }
         if (!this.state.currentQuery.catalog) {
             this.props.queries.updateQuery(this.state.currentQuery.id, { catalog: 'AwsDataCatalog' })
+        }
+        const current = this.props.queries.getCurrentQuery()
+        if (current.schema && current.catalog) {
+            this.loadTablesForSchema(current.catalog, current.schema)
         }
         this.queryRunner = new AsyncAthenaClient()
         this.setupQueryRunner()
@@ -136,6 +141,21 @@ class QueryCell extends React.Component<QueryCellProps, QueryCellState> {
 
     handleSchemaChange = (schema: string) => {
         this.props.queries.updateQuery(this.state.currentQuery.id, { schema: schema })
+        const catalog = this.props.queries.getCurrentQuery().catalog
+        if (catalog) {
+            this.loadTablesForSchema(catalog, schema)
+        }
+    }
+
+    loadTablesForSchema(catalog: string, schema: string) {
+        SchemaProvider.loadTablesForDatabase(
+            catalog,
+            schema,
+            () => {},
+            (error: string) => {
+                console.error('Failed to load tables:', error)
+            }
+        )
     }
 
     ClearResults() {
