@@ -18,7 +18,7 @@ interface IQueryEditor {
     enableCatalogSearchColumns?: boolean
 }
 
-const DRAWER_WIDTH = 260
+const DRAWER_WIDTH = 300
 
 const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })<{
     open?: boolean
@@ -195,16 +195,19 @@ export const QueryEditor = ({ height, theme, enableCatalogSearchColumns }: IQuer
                         <Tab value="catalog" label="Catalog" />
                         <Tab value="history" label="History" />
                     </Tabs>
-                    {drawerTab === 'history' ? (
+                    <Box sx={{ display: drawerTab === 'history' ? 'flex' : 'none', flex: 1, minHeight: 0 }}>
                         <QueryHistory onSelectQuery={setQueryContent} />
-                    ) : (
+                    </Box>
+                    <Box sx={{ display: drawerTab === 'catalog' ? 'flex' : 'none', flex: 1, minHeight: 0 }}>
                         <CatalogViewer
                             onGenerateQuery={setQueryContent}
                             onAppendQuery={appendQueryContent}
                             onDrawerToggle={() => setDrawerOpen(false)}
                             enableSearchColumns={enableCatalogSearchColumns}
+                            currentCatalog={currentQuery.catalog}
+                            currentSchema={currentQuery.schema}
                         />
-                    )}
+                    </Box>
                 </Drawer>
 
                 <Main open={drawerOpen} sx={{ p: 0 }}>

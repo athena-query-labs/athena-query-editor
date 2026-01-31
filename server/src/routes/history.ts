@@ -48,7 +48,10 @@ export function createHistoryRouter(pool: Pool) {
           queueTimeSeconds: formatSeconds(row.queue_time_ms),
           executionTimeSeconds: formatSeconds(row.execution_time_ms),
           scannedGB: formatGB(row.scanned_bytes),
-          estimatedCost: row.estimated_cost_usd ? { amount: Number(row.estimated_cost_usd), currency: 'USD' } : null,
+          estimatedCost:
+            row.estimated_cost_usd === null || row.estimated_cost_usd === undefined
+              ? null
+              : { amount: Number(row.estimated_cost_usd), currency: 'USD' },
         },
       }))
 
