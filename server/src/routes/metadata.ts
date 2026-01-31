@@ -38,7 +38,7 @@ export function createMetadataRouter(config: AppConfig, athena: AthenaClient) {
         new ListTableMetadataCommand({
           CatalogName: config.defaultCatalog,
           DatabaseName: database,
-          MaxResults: 1000,
+          MaxResults: 50,
         })
       )
       const tables = (result.TableMetadataList ?? []).map((tbl) => tbl.Name).filter(Boolean)
