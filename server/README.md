@@ -59,6 +59,14 @@ S3 (for Athena output + downloads):
 - `s3:GetObject` and `s3:HeadObject` on the output location bucket/prefix
 - `s3:ListBucket` on the bucket (optional, for some SDK behaviors)
 
+## Metadata API mapping
+
+The metadata routes proxy directly to Athena APIs:
+
+- `GET /api/metadata/databases` → `ListDatabases`
+- `GET /api/metadata/tables?database=<db>` → `ListTableMetadata`
+- `GET /api/metadata/columns?database=<db>&table=<table>` → `GetTableMetadata`
+
 ## Migrations
 
 Apply `migrations/001_create_query_history.sql` to provision query history storage.

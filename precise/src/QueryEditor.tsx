@@ -80,6 +80,7 @@ export const QueryEditor = ({ height, theme, enableCatalogSearchColumns }: IQuer
     const [currentQuery, setCurrentQuery] = useState<QueryInfo>(queries.getCurrentQuery())
     const [drawerTab, setDrawerTab] = useState<'catalog' | 'history'>('catalog')
     const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)')
+    const enableSearchColumns = false
     const containerRef = useRef(null)
 
     const muiThemeToUse = () => {
@@ -201,7 +202,7 @@ export const QueryEditor = ({ height, theme, enableCatalogSearchColumns }: IQuer
                             onGenerateQuery={setQueryContent}
                             onAppendQuery={appendQueryContent}
                             onDrawerToggle={() => setDrawerOpen(false)}
-                            enableSearchColumns={enableCatalogSearchColumns}
+                            enableSearchColumns={enableSearchColumns}
                             currentCatalog={currentQuery.catalog}
                             currentSchema={currentQuery.schema}
                         />
