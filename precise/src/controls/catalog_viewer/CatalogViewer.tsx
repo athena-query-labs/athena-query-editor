@@ -98,9 +98,7 @@ const CatalogViewer: React.FC<CatalogViewerProps> = ({
                     setCatalogs(nextCatalogs)
                     if (viewerState.current) {
                         Array.from(nextCatalogs.keys()).forEach((catalogName) => {
-                            if (!viewerState.current?.isExpanded(catalogName)) {
-                                viewerState.current?.toggleExpanded(catalogName)
-                            }
+                            viewerState.current?.setExpanded(catalogName, true)
                         })
                     }
                     setIsLoading(false)
@@ -116,16 +114,14 @@ const CatalogViewer: React.FC<CatalogViewerProps> = ({
         }
     }, [])
 
-    const handleToggle = async (path: string) => {
+    const handleToggle = async (path: string, isExpanded: boolean) => {
         if (!viewerState.current) return
 
-        // Toggle the expansion state
-        viewerState.current.toggleExpanded(path)
-        const isExpandedNow = viewerState.current.isExpanded(path)
+        viewerState.current.setExpanded(path, isExpanded)
 
         // If it's a database path, lazy load tables
         const pathParts = path.split('.')
-        if (pathParts.length === 2 && isExpandedNow) {
+        if (pathParts.length === 2 && isExpanded) {
             const catalogName = pathParts[0]
             const databaseName = pathParts[1]
             await SchemaProvider.loadTablesForDatabase(
@@ -138,7 +134,7 @@ const CatalogViewer: React.FC<CatalogViewerProps> = ({
         }
 
         // If it's a table path, ensure data is loaded
-        if (pathParts.length === 3) {
+        if (pathParts.length === 3 && isExpanded) {
             const tableRef = new TableReference(pathParts[0], pathParts[1], pathParts[2])
 
             await new Promise<void>((resolve) => {
@@ -321,8 +317,9 @@ const CatalogViewer: React.FC<CatalogViewerProps> = ({
                             gap: 0.5,
                         },
                     }}
-                    onItemExpansionToggle={(_, itemId) => {
-                        handleToggle(itemId)
+                    expandedItems={Array.from(expandedNodes)}
+                    onItemExpansionToggle={(_, itemId, expanded) => {
+                        handleToggle(itemId, expanded)
                     }}
                 >
                     {Array.from(catalogs.values())
