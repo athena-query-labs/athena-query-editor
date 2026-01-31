@@ -13,6 +13,7 @@ class SchemaProvider {
     static tables: Map<string, Table> = new Map<string, Table>()
     static loadedSchemas: Set<string> = new Set()
     static loadingSchemas: Set<string> = new Set()
+    static schemaErrors: Map<string, string> = new Map()
     static loadingCatalogs: boolean = false
 
     static getTableNameList(catalogFilter: string | undefined, schemaFilter: string | undefined): string[] {
@@ -131,6 +132,7 @@ class SchemaProvider {
             return
         }
         this.loadingSchemas.add(key)
+        this.schemaErrors.delete(key)
         try {
             const tablesResponse = await fetch(`/api/metadata/tables?database=${encodeURIComponent(databaseName)}`)
             if (!tablesResponse.ok) {
@@ -153,9 +155,12 @@ class SchemaProvider {
                 }
             }
             this.loadedSchemas.add(key)
+            this.schemaErrors.delete(key)
             callback?.(new Map(this.catalogs))
         } catch (error) {
-            errorCallback?.(error instanceof Error ? error.message : String(error))
+            const message = error instanceof Error ? error.message : String(error)
+            this.schemaErrors.set(key, message)
+            errorCallback?.(message)
         } finally {
             this.loadingSchemas.delete(key)
         }
@@ -177,6 +182,7 @@ class SchemaProvider {
             for (const col of data.columns ?? []) {
                 table.getColumns().push(new Column(col.name, col.type, col.comment || '', ''))
             }
+            table.setLoading(false)
             this.tables.set(tableRef.fullyQualified, table)
             const catalog = tableRef.getCatalog()
             const schema = tableRef.getSchema()

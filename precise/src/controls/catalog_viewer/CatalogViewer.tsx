@@ -31,6 +31,8 @@ interface CatalogViewerProps {
     onAppendQuery?: (query: string, catalog?: string, schema?: string) => void
     onDrawerToggle?: () => void
     enableSearchColumns?: boolean
+    currentCatalog?: string | null
+    currentSchema?: string | null
 }
 
 const CatalogViewer: React.FC<CatalogViewerProps> = ({
@@ -39,6 +41,8 @@ const CatalogViewer: React.FC<CatalogViewerProps> = ({
     onAppendQuery,
     onDrawerToggle,
     enableSearchColumns,
+    currentCatalog,
+    currentSchema,
 }) => {
     // Basic state
     const [catalogs, setCatalogs] = useState<Map<string, Catalog>>(new Map())
@@ -159,6 +163,16 @@ const CatalogViewer: React.FC<CatalogViewerProps> = ({
     const isExpanded = (path: string): boolean => viewerState.current?.isExpanded(path) ?? false
 
     const hasMatchingChildren = (path: string): boolean => viewerState.current?.hasMatchingChildren(path) ?? false
+
+    useEffect(() => {
+        if (!viewerState.current) return
+        if (currentCatalog) {
+            viewerState.current.setExpanded(currentCatalog, true)
+        }
+        if (currentCatalog && currentSchema) {
+            viewerState.current.setExpanded(buildPath.schema(currentCatalog, currentSchema), true)
+        }
+    }, [currentCatalog, currentSchema])
 
     // Generate query handler
     const handleGenerateQuery = (
@@ -378,6 +392,7 @@ const CatalogViewer: React.FC<CatalogViewerProps> = ({
                                             .map((schema) => {
                                                 const schemaName = schema.getName()
                                                 const schemaPath = buildPath.schema(catalogName, schemaName)
+                                                const schemaKey = `${catalogName}.${schemaName}`
 
                                                 return (
                                                     <CatalogViewerSchema
@@ -388,6 +403,12 @@ const CatalogViewer: React.FC<CatalogViewerProps> = ({
                                                         isVisible={isVisible}
                                                         isLoading={isLoading}
                                                         hasMatchingChildren={hasMatchingChildren}
+                                                        isActive={
+                                                            catalogName === currentCatalog && schemaName === currentSchema
+                                                        }
+                                                        isSchemaLoading={SchemaProvider.loadingSchemas.has(schemaKey)}
+                                                        schemaError={SchemaProvider.schemaErrors.get(schemaKey)}
+                                                        isSchemaLoaded={SchemaProvider.loadedSchemas.has(schemaKey)}
                                                         onGenerateQuery={handleGenerateQuery}
                                                     />
                                                 )

@@ -1,5 +1,5 @@
 import React from 'react'
-import { Box, IconButton, Typography } from '@mui/material'
+import { Box, IconButton, Typography, Tooltip } from '@mui/material'
 import { TreeItem } from '@mui/x-tree-view'
 import AccountTreeOutlinedIcon from '@mui/icons-material/AccountTreeOutlined'
 import ChevronRightIcon from '@mui/icons-material/ChevronRight'
@@ -16,6 +16,10 @@ interface SchemaProps {
     isVisible: (path: string) => boolean
     isLoading: boolean
     hasMatchingChildren: (path: string) => boolean
+    isActive: boolean
+    isSchemaLoading: boolean
+    schemaError?: string
+    isSchemaLoaded: boolean
     onGenerateQuery?: (
         queryType: string,
         tableRef: TableReference | null,
@@ -31,6 +35,10 @@ const CatalogViewerSchema: React.FC<SchemaProps> = ({
     isVisible,
     isLoading,
     hasMatchingChildren,
+    isActive,
+    isSchemaLoading,
+    schemaError,
+    isSchemaLoaded,
     onGenerateQuery,
 }) => {
     const schemaPath = buildPath.schema(catalogName, schema.getName())
@@ -66,7 +74,15 @@ const CatalogViewerSchema: React.FC<SchemaProps> = ({
                         gap: 8,
                     }}
                 >
-                    <Typography fontSize="small">{schema.getName()}</Typography>
+                    <Typography
+                        fontSize="small"
+                        sx={{
+                            fontWeight: isActive ? 600 : 400,
+                            color: isActive ? 'primary.main' : 'inherit',
+                        }}
+                    >
+                        {schema.getName()}
+                    </Typography>
 
                     <IconButton
                         title="Set this schema as default schema"
@@ -87,10 +103,30 @@ const CatalogViewerSchema: React.FC<SchemaProps> = ({
                 },
             }}
         >
-            {tables.length === 0 ? (
+            {schemaError ? (
+                <TreeItem
+                    itemId={`${schemaPath}.__error`}
+                    label={
+                        <Tooltip title={schemaError}>
+                            <Typography fontSize="small" color="error.main">
+                                Failed to load tables
+                            </Typography>
+                        </Tooltip>
+                    }
+                />
+            ) : isSchemaLoading ? (
                 <TreeItem
                     itemId={`${schemaPath}.__loading`}
-                    label={<Typography fontSize="small" color="text.secondary">Click to load tables</Typography>}
+                    label={<Typography fontSize="small" color="text.secondary">Loading tables...</Typography>}
+                />
+            ) : tables.length === 0 ? (
+                <TreeItem
+                    itemId={`${schemaPath}.__empty`}
+                    label={
+                        <Typography fontSize="small" color="text.secondary">
+                            {isSchemaLoaded ? 'No tables found' : 'Click to load tables'}
+                        </Typography>
+                    }
                 />
             ) : (
                 tables.map((table: Table) => {
