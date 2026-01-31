@@ -6,6 +6,7 @@ import { createPool } from './db.js'
 import { requireUser } from './middleware/auth.js'
 import { createQueryRouter } from './routes/query.js'
 import { createMetadataRouter } from './routes/metadata.js'
+import { createHistoryRouter } from './routes/history.js'
 
 const config = loadConfig()
 const athena = createAthenaClient(config)
@@ -22,6 +23,7 @@ app.get('/health', (_req, res) => {
 
 app.use('/api/query', createQueryRouter(config, athena, s3, pool))
 app.use('/api/metadata', createMetadataRouter(config, athena))
+app.use('/api/history', createHistoryRouter(pool))
 
 app.use((err: unknown, _req: Request, res: Response, _next: NextFunction) => {
   const message = err instanceof Error ? err.message : 'Unknown error'
