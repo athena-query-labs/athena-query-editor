@@ -47,6 +47,12 @@ Backend smoke test (server must be running):
 SMOKE_BASE_URL=http://localhost:8081 SMOKE_USER_EMAIL=you@example.com npm run test:smoke
 ```
 
+Backend query lifecycle test:
+
+```
+SMOKE_BASE_URL=http://localhost:8081 SMOKE_USER_EMAIL=you@example.com npm run test:query
+```
+
 Implementation details:
 
 * React TypeScript project with Vite
