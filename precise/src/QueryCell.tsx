@@ -11,7 +11,7 @@ import QueryEditorPane from './QueryEditorPane'
 import ResultSet from './ResultSet'
 import Queries from './schema/Queries'
 import QueryInfo from './schema/QueryInfo'
-import AsyncTrinoClient from './AsyncTrinoClient'
+import AsyncAthenaClient from './AsyncAthenaClient'
 
 const TOOLBAR_HEIGHT = 64
 
@@ -37,7 +37,7 @@ interface QueryCellProps {
 }
 
 class QueryCell extends React.Component<QueryCellProps, QueryCellState> {
-    private queryRunner: AsyncTrinoClient
+    private queryRunner: AsyncAthenaClient
 
     constructor(props: QueryCellProps) {
         super(props)
@@ -53,7 +53,10 @@ class QueryCell extends React.Component<QueryCellProps, QueryCellState> {
             editingSchema: false,
             editorCollapsed: false,
         }
-        this.queryRunner = new AsyncTrinoClient()
+        if (!this.state.currentQuery.catalog) {
+            this.props.queries.updateQuery(this.state.currentQuery.id, { catalog: 'AwsDataCatalog' })
+        }
+        this.queryRunner = new AsyncAthenaClient()
         this.setupQueryRunner()
     }
 
@@ -113,12 +116,6 @@ class QueryCell extends React.Component<QueryCellProps, QueryCellState> {
             this.QueryStarted()
         }
 
-        this.queryRunner.SetHeadersCallback((catalog: string | null, schema: string | null) => {
-            this.props.queries.updateQuery(this.state.currentQuery.id, {
-                catalog: catalog ?? undefined,
-                schema: schema ?? undefined,
-            })
-        })
     }
 
     setRunningQueryId = (queryId: string | null) => {
@@ -227,8 +224,8 @@ class QueryCell extends React.Component<QueryCellProps, QueryCellState> {
         const { results, columns, response, errorMessage, currentQuery, runningQuery } = this.state
         const isQueryRunning =
             runningQuery !== undefined &&
-            response.stats !== undefined &&
-            (response.stats.state === 'RUNNING' || response.stats.state === 'QUEUED')
+            response.state !== undefined &&
+            (response.state === 'RUNNING' || response.state === 'QUEUED')
 
         const availablePanelHeight = Math.max(this.props.height - TOOLBAR_HEIGHT, 0)
         const resultSetHeight = this.state.editorCollapsed ? availablePanelHeight : availablePanelHeight / 2
@@ -293,7 +290,7 @@ class QueryCell extends React.Component<QueryCellProps, QueryCellState> {
 
                         <Stack direction="row" spacing={1}>
                             <Box component="span" sx={{ fontWeight: 600, color: 'text.secondary', mr: 0.5 }}>
-                                Schema:
+                                Database:
                             </Box>
                             {this.renderEditableTextField('editingSchema', currentQuery.schema ?? '', {
                                 typographyProps: {
@@ -342,7 +339,7 @@ class QueryCell extends React.Component<QueryCellProps, QueryCellState> {
                     response={response}
                     height={resultSetHeight}
                     errorMessage={errorMessage}
-                    queryId={runningQuery?.id}
+                    queryId={response?.queryId}
                     onClearResults={() => this.ClearResults()}
                 />
             </Box>

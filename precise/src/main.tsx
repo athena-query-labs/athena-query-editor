@@ -35,7 +35,7 @@ export default function App() {
                 gridTemplateRows: 'auto 1fr auto',
             }}
         >
-            <h1>Trino query editor - Example app</h1>
+            <h1>Athena query editor - Example app</h1>
             <div ref={slotRef} style={{ minHeight: 0 }}>
                 <QueryEditor theme="dark" height={slotHeight} />
             </div>
