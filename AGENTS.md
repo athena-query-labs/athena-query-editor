@@ -1,0 +1,17 @@
+## Lessons Learned / Execution Notes
+
+- **Repo structure:** This repo is frontend-only by default (`precise/`). Backend must be added under `server/` for Athena integration.
+- **Auth model:** Backend expects `X-Email` from oauth2-proxy. Requests without it must be rejected (401). Use Vite proxy to inject `X-Email` during local dev.
+- **AWS credentials:** Default credential chain may not be the intended profile. Use `.env` with `AWS_PROFILE=dp-iam` to avoid accidental assumed-role permissions.
+- **Athena metadata API limit:** `ListTableMetadata` enforces `MaxResults <= 50`. Larger values cause validation errors.
+- **S3 output handling:** Athena output location may be bucket or prefix; download helper must normalize to `<prefix>/<queryId>.csv`.
+- **Polling & timeout:** Poll every 1s, timeout at 24h, cancel on timeout, return `TIMEOUT` state to UI.
+- **Metrics formatting:** UI expects queue/exec time in seconds with 2 decimals; scanned size in GB with 2 decimals; cost estimated by region pricing config.
+- **Downloads:** Always attempt presigned URL; if no result file exists return “no download available.” Mark partial downloads when FAILED/CANCELLED.
+- **Postgres migration:** `query_history` must be created before server use; store by `user_email` + `query_execution_id`.
+- **Dev flow:** Build server after route changes (dist used in smoke tests). Use `server/.env` and `server/.gitignore` to avoid committing env.
+- **Local auth in dev:** When hitting APIs manually, remember to include `X-Email` header or requests will 401.
+- **Vite proxy:** Update Vite proxy from `/v1` (Trino) to `/api` (Athena backend) or the UI will keep calling the old Trino endpoints.
+- **Dist vs source:** If using `node dist/index.js` for smoke tests, rebuild after source changes or you’ll hit stale behavior.
+- **Permission debugging:** `aws sts get-caller-identity` is the quickest way to confirm which profile/role is actually being used.
+- **Git staging:** In this environment, `git add` may require escalated permissions due to index lock; rerun with elevated sandbox if needed.
