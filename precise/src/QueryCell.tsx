@@ -1,5 +1,5 @@
 import React, { ReactNode } from 'react'
-import { Box, Divider, IconButton, Stack, TextField, Toolbar, Typography } from '@mui/material'
+import { Box, Divider, IconButton, Stack, Toolbar, Typography } from '@mui/material'
 import type { TextFieldProps } from '@mui/material/TextField'
 import type { TypographyProps } from '@mui/material/Typography'
 import MenuIcon from '@mui/icons-material/Menu'
@@ -34,7 +34,7 @@ interface QueryCellProps {
     drawerOpen: boolean
     height: number
     onDrawerToggle: () => void
-    theme?: string
+    themeMode: 'light' | 'dark'
 }
 
 class QueryCell extends React.Component<QueryCellProps, QueryCellState> {
@@ -74,6 +74,7 @@ class QueryCell extends React.Component<QueryCellProps, QueryCellState> {
         return (
             this.props.drawerOpen !== nextProps.drawerOpen ||
             this.props.height !== nextProps.height ||
+            this.props.themeMode !== nextProps.themeMode ||
             this.state.results !== nextState.results ||
             this.state.columns !== nextState.columns ||
             this.state.response !== nextState.response ||
@@ -344,10 +345,10 @@ class QueryCell extends React.Component<QueryCellProps, QueryCellState> {
                         queries={this.props.queries}
                         catalog={currentQuery.catalog}
                         schema={currentQuery.schema}
-                        theme={this.props.theme}
+                        theme={this.props.themeMode}
                         maxHeight={availablePanelHeight}
                     />
-                    {this.props.theme != 'dark' && <Divider />}
+                    {this.props.themeMode !== 'dark' && <Divider />}
                 </Box>
                 <ResultSet
                     columns={columns}

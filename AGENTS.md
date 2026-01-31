@@ -15,3 +15,4 @@
 - **Dist vs source:** If using `node dist/index.js` for smoke tests, rebuild after source changes or you’ll hit stale behavior.
 - **Permission debugging:** `aws sts get-caller-identity` is the quickest way to confirm which profile/role is actually being used.
 - **Git staging:** In this environment, `git add` may require escalated permissions due to index lock; rerun with elevated sandbox if needed.
+- **Signed commits:** All commits must use `git commit -s -S`.
