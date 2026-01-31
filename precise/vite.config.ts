@@ -11,6 +11,9 @@ export default defineConfig({
         target: 'http://localhost:8081',
         changeOrigin: true,
         secure: false,
+        headers: process.env.VITE_DEV_USER_EMAIL
+          ? { 'X-Email': process.env.VITE_DEV_USER_EMAIL }
+          : undefined,
       },
     },
   },

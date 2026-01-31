@@ -35,6 +35,12 @@ ATHENA_DEFAULT_DATABASE=
 ATHENA_PRICING_FILE=config/athena-pricing.json
 ```
 
+Frontend dev (Vite) header injection:
+
+```
+VITE_DEV_USER_EMAIL=you@example.com
+```
+
 Implementation details:
 
 * React TypeScript project with Vite
