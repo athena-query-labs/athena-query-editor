@@ -41,6 +41,24 @@ ATHENA_PRICING_FILE=config/athena-pricing.json
 PORT=8081
 ```
 
+## IAM permissions (minimum)
+
+The AWS credentials used by this service need permissions for:
+
+Athena:
+- `athena:StartQueryExecution`
+- `athena:GetQueryExecution`
+- `athena:GetQueryResults`
+- `athena:StopQueryExecution`
+- `athena:ListDatabases`
+- `athena:ListTableMetadata`
+- `athena:GetTableMetadata`
+
+S3 (for Athena output + downloads):
+- `s3:PutObject` on the output location bucket/prefix
+- `s3:GetObject` and `s3:HeadObject` on the output location bucket/prefix
+- `s3:ListBucket` on the bucket (optional, for some SDK behaviors)
+
 ## Migrations
 
 Apply `migrations/001_create_query_history.sql` to provision query history storage.
