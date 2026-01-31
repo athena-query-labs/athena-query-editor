@@ -9,6 +9,7 @@ import { darkTheme, lightTheme } from './theme'
 import Queries from './schema/Queries'
 import QueryInfo from './schema/QueryInfo'
 import CatalogViewer from './controls/catalog_viewer/CatalogViewer'
+import QueryHistory from './controls/history/QueryHistory'
 
 interface IQueryEditor {
     height: number
@@ -183,6 +184,7 @@ export const QueryEditor = ({ height, theme, enableCatalogSearchColumns }: IQuer
                         },
                     }}
                 >
+                    <QueryHistory onSelectQuery={setQueryContent} />
                     <CatalogViewer
                         onGenerateQuery={setQueryContent}
                         onAppendQuery={appendQueryContent}
