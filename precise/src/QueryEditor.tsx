@@ -199,13 +199,7 @@ export const QueryEditor = ({ height, theme, enableCatalogSearchColumns }: IQuer
                         drawerOpen={drawerOpen}
                         height={height}
                         onDrawerToggle={() => setDrawerOpen(true)}
-                        themeMode={
-                            theme === 'dark' || theme === 'light'
-                                ? theme
-                                : prefersDarkMode
-                                  ? 'dark'
-                                  : 'light'
-                        }
+                        themeMode={theme === 'dark' || theme === 'light' ? theme : prefersDarkMode ? 'dark' : 'light'}
                     />
                 </Main>
             </Box>

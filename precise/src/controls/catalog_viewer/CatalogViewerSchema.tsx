@@ -117,7 +117,11 @@ const CatalogViewerSchema: React.FC<SchemaProps> = ({
             ) : isSchemaLoading ? (
                 <TreeItem
                     itemId={`${schemaPath}.__loading`}
-                    label={<Typography fontSize="small" color="text.secondary">Loading tables...</Typography>}
+                    label={
+                        <Typography fontSize="small" color="text.secondary">
+                            Loading tables...
+                        </Typography>
+                    }
                 />
             ) : tables.length === 0 ? (
                 <TreeItem

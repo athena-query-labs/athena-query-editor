@@ -405,7 +405,8 @@ const CatalogViewer: React.FC<CatalogViewerProps> = ({
                                                         isLoading={isLoading}
                                                         hasMatchingChildren={hasMatchingChildren}
                                                         isActive={
-                                                            catalogName === currentCatalog && schemaName === currentSchema
+                                                            catalogName === currentCatalog &&
+                                                            schemaName === currentSchema
                                                         }
                                                         isSchemaLoading={SchemaProvider.loadingSchemas.has(schemaKey)}
                                                         schemaError={SchemaProvider.schemaErrors.get(schemaKey)}

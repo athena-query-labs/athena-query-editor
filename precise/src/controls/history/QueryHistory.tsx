@@ -232,7 +232,11 @@ const QueryHistory: React.FC<QueryHistoryProps> = ({ onSelectQuery, onDrawerTogg
                                                     },
                                                 }}
                                             />
-                                            <Typography variant="caption" color="text.secondary" sx={{ whiteSpace: 'nowrap' }}>
+                                            <Typography
+                                                variant="caption"
+                                                color="text.secondary"
+                                                sx={{ whiteSpace: 'nowrap' }}
+                                            >
                                                 {formatSubmittedAt(item.submitted_at)}
                                             </Typography>
                                             <Box
@@ -244,7 +248,11 @@ const QueryHistory: React.FC<QueryHistoryProps> = ({ onSelectQuery, onDrawerTogg
                                                     flexShrink: 0,
                                                 }}
                                             >
-                                                <Tooltip title={copiedSqlId === item.query_execution_id ? 'Copied' : 'Copy SQL'}>
+                                                <Tooltip
+                                                    title={
+                                                        copiedSqlId === item.query_execution_id ? 'Copied' : 'Copy SQL'
+                                                    }
+                                                >
                                                     <IconButton
                                                         size="small"
                                                         onClick={(event) =>
@@ -256,7 +264,9 @@ const QueryHistory: React.FC<QueryHistoryProps> = ({ onSelectQuery, onDrawerTogg
                                                     </IconButton>
                                                 </Tooltip>
                                                 <Tooltip
-                                                    title={expandedId === item.query_execution_id ? 'Collapse' : 'Expand'}
+                                                    title={
+                                                        expandedId === item.query_execution_id ? 'Collapse' : 'Expand'
+                                                    }
                                                 >
                                                     <IconButton
                                                         size="small"
@@ -285,7 +295,11 @@ const QueryHistory: React.FC<QueryHistoryProps> = ({ onSelectQuery, onDrawerTogg
                                                     title={<Typography variant="caption">{item.sql_text}</Typography>}
                                                     placement="right"
                                                 >
-                                                    <Typography variant="caption" noWrap sx={{ maxWidth: 420, minWidth: 0 }}>
+                                                    <Typography
+                                                        variant="caption"
+                                                        noWrap
+                                                        sx={{ maxWidth: 420, minWidth: 0 }}
+                                                    >
                                                         {item.sql_text}
                                                     </Typography>
                                                 </Tooltip>
@@ -320,26 +334,49 @@ const QueryHistory: React.FC<QueryHistoryProps> = ({ onSelectQuery, onDrawerTogg
                                             }
                                             placement="right"
                                         >
-                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, flexWrap: 'wrap' }}>
-                                                <Typography variant="caption" color="text.secondary" sx={{ whiteSpace: 'nowrap' }}>
+                                            <Box
+                                                sx={{
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    gap: 0.5,
+                                                    flexWrap: 'wrap',
+                                                }}
+                                            >
+                                                <Typography
+                                                    variant="caption"
+                                                    color="text.secondary"
+                                                    sx={{ whiteSpace: 'nowrap' }}
+                                                >
                                                     Q {formatSeconds(item.stats?.queueTimeSeconds)}
                                                 </Typography>
-                                                <Typography variant="caption" color="text.secondary" sx={{ whiteSpace: 'nowrap' }}>
+                                                <Typography
+                                                    variant="caption"
+                                                    color="text.secondary"
+                                                    sx={{ whiteSpace: 'nowrap' }}
+                                                >
                                                     E {formatSeconds(item.stats?.executionTimeSeconds)}
                                                 </Typography>
-                                                <Typography variant="caption" color="text.secondary" sx={{ whiteSpace: 'nowrap' }}>
+                                                <Typography
+                                                    variant="caption"
+                                                    color="text.secondary"
+                                                    sx={{ whiteSpace: 'nowrap' }}
+                                                >
                                                     S {formatGB(item.stats?.scannedGB)}
                                                 </Typography>
-                                                <Typography variant="caption" color="text.secondary" sx={{ whiteSpace: 'nowrap' }}>
+                                                <Typography
+                                                    variant="caption"
+                                                    color="text.secondary"
+                                                    sx={{ whiteSpace: 'nowrap' }}
+                                                >
                                                     C {formatCost(item.stats?.estimatedCost)}
                                                 </Typography>
                                             </Box>
                                         </Tooltip>
                                     </Box>
                                 }
-                            primaryTypographyProps={{ component: 'div' }}
-                        />
-                    </ListItem>
+                                primaryTypographyProps={{ component: 'div' }}
+                            />
+                        </ListItem>
                         <Divider
                             sx={{
                                 my: 0.35,
