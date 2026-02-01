@@ -230,7 +230,7 @@ const CatalogViewer: React.FC<CatalogViewerProps> = ({
                     alignItems: 'center',
                     justifyContent: 'center',
                     width: '100%',
-                    minHeight: (theme) => `calc(${theme.mixins.toolbar.minHeight}px + ${theme.spacing(1)})`,
+                    minHeight: (theme) => `calc(${theme.mixins.toolbar.minHeight}px - ${theme.spacing(0.5)})`,
                     px: 0,
                     py: 0,
                 }}
