@@ -2,7 +2,6 @@ import React, { useRef, useState } from 'react'
 import { styled } from '@mui/material/styles'
 import { Box, Drawer, useMediaQuery } from '@mui/material'
 import CssBaseline from '@mui/material/CssBaseline'
-import MuiAppBar, { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar'
 import { ThemeProvider } from '@mui/material/styles'
 import QueryCell from './QueryCell'
 import { darkTheme, lightTheme } from './theme'
@@ -20,63 +19,15 @@ interface IQueryEditor {
 
 const DRAWER_WIDTH = 300
 
-const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })<{
-    open?: boolean
-}>(({ theme }) => ({
-    flexGrow: 1,
+const Main = styled('main')(({ theme }) => ({
+    minWidth: 0,
     padding: theme.spacing(3),
-    transition: theme.transitions.create('margin', {
-        easing: theme.transitions.easing.sharp,
-        duration: theme.transitions.duration.leavingScreen,
-    }),
-    marginLeft: 0,
-    variants: [
-        {
-            props: ({ open }) => open,
-            style: {
-                transition: theme.transitions.create('margin', {
-                    easing: theme.transitions.easing.easeOut,
-                    duration: theme.transitions.duration.enteringScreen,
-                }),
-                marginLeft: `${DRAWER_WIDTH}px`,
-            },
-        },
-    ],
-}))
-
-interface AppBarProps extends MuiAppBarProps {
-    open?: boolean
-}
-
-const AppBar = styled(MuiAppBar, {
-    shouldForwardProp: (prop) => prop !== 'open',
-})<AppBarProps>(({ theme }) => ({
-    position: 'absolute',
-    boxShadow: 'none',
-    borderBottom: `1px solid ${theme.palette.divider}`,
-    transition: theme.transitions.create(['margin', 'width'], {
-        easing: theme.transitions.easing.sharp,
-        duration: theme.transitions.duration.leavingScreen,
-    }),
-    variants: [
-        {
-            props: ({ open }) => open,
-            style: {
-                width: `calc(100% - ${DRAWER_WIDTH}px)`,
-                marginLeft: `${DRAWER_WIDTH}px`,
-                transition: theme.transitions.create(['margin', 'width'], {
-                    easing: theme.transitions.easing.easeOut,
-                    duration: theme.transitions.duration.enteringScreen,
-                }),
-            },
-        },
-    ],
+    width: '100%',
 }))
 
 export const QueryEditor = ({ height, theme, enableCatalogSearchColumns }: IQueryEditor) => {
-    const [queries, setQueries] = useState<Queries>(() => new Queries())
+    const [queries] = useState<Queries>(() => new Queries())
     const [drawerOpen, setDrawerOpen] = useState<boolean>(true)
-    const [queryRunning, setQueryRunning] = useState<boolean>(false)
     const [currentQuery, setCurrentQuery] = useState<QueryInfo>(queries.getCurrentQuery())
     const [drawerTab, setDrawerTab] = useState<'catalog' | 'history'>('catalog')
     const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)')
@@ -154,17 +105,22 @@ export const QueryEditor = ({ height, theme, enableCatalogSearchColumns }: IQuer
                     position: 'relative',
                     overflow: 'hidden',
                     height: height,
+                    minWidth: 0,
+                    display: 'grid',
+                    gridTemplateColumns: drawerOpen ? `${DRAWER_WIDTH}px 1fr` : '0px 1fr',
                 }}
             >
-                <AppBar color="transparent" open={drawerOpen} />
-
                 <Drawer
                     sx={{
-                        width: DRAWER_WIDTH,
+                        gridColumn: 1,
                         flexShrink: 0,
+                        pointerEvents: drawerOpen ? 'auto' : 'none',
                         '& .MuiDrawer-paper': {
-                            width: DRAWER_WIDTH,
+                            width: '100%',
                             boxSizing: 'border-box',
+                            overflowX: 'hidden',
+                            height: '100%',
+                            position: 'static',
                         },
                     }}
                     variant="persistent"
@@ -177,7 +133,7 @@ export const QueryEditor = ({ height, theme, enableCatalogSearchColumns }: IQuer
                     slotProps={{
                         paper: {
                             sx: {
-                                position: 'absolute',
+                                position: 'static',
                                 display: 'flex',
                                 flexDirection: 'column',
                                 overflow: 'hidden',
@@ -195,7 +151,7 @@ export const QueryEditor = ({ height, theme, enableCatalogSearchColumns }: IQuer
                         <Tab value="history" label="History" />
                     </Tabs>
                     <Box sx={{ display: drawerTab === 'history' ? 'flex' : 'none', flex: 1, minHeight: 0 }}>
-                        <QueryHistory onSelectQuery={setQueryContent} />
+                        <QueryHistory onSelectQuery={setQueryContent} onDrawerToggle={() => setDrawerOpen(false)} />
                     </Box>
                     <Box sx={{ display: drawerTab === 'catalog' ? 'flex' : 'none', flex: 1, minHeight: 0 }}>
                         <CatalogViewer
@@ -209,7 +165,7 @@ export const QueryEditor = ({ height, theme, enableCatalogSearchColumns }: IQuer
                     </Box>
                 </Drawer>
 
-                <Main open={drawerOpen} sx={{ p: 0 }}>
+                <Main sx={{ p: 0, minWidth: 0, gridColumn: 2 }}>
                     <QueryCell
                         queries={queries}
                         drawerOpen={drawerOpen}
