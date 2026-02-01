@@ -219,6 +219,7 @@ const CatalogViewer: React.FC<CatalogViewerProps> = ({
                 flexDirection: 'column',
                 flex: 1,
                 height: '100%',
+                minHeight: 0,
                 overflow: 'hidden',
             }}
         >

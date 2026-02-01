@@ -148,7 +148,7 @@ const QueryHistory: React.FC<QueryHistoryProps> = ({ onSelectQuery, onDrawerTogg
                     )}
                 </Box>
             </Box>
-            <List dense sx={{ minWidth: 0, py: 0 }}>
+            <List dense sx={{ flex: 1, minHeight: 0, overflowY: 'auto', minWidth: 0, py: 0 }}>
                 {items.map((item) => (
                     <React.Fragment key={item.query_execution_id}>
                         <ListItem
