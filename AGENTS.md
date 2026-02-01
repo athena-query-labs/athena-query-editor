@@ -2,7 +2,7 @@
 
 - **Repo structure:** This repo is frontend-only by default (`precise/`). Backend must be added under `server/` for Athena integration.
 - **Auth model:** Backend expects `X-Email` from oauth2-proxy. Requests without it must be rejected (401). Use Vite proxy to inject `X-Email` during local dev.
-- **AWS credentials:** Default credential chain may not be the intended profile. Use `.env` with `AWS_PROFILE=dp-iam` to avoid accidental assumed-role permissions.
+- **AWS credentials:** Default credential chain may not be the intended profile. Use `.env` with `AWS_PROFILE=<your-profile>` to avoid accidental assumed-role permissions.
 - **Athena metadata API limit:** `ListTableMetadata` enforces `MaxResults <= 50`. Larger values cause validation errors.
 - **S3 output handling:** Athena output location may be bucket or prefix; download helper must normalize to `<prefix>/<queryId>.csv`.
 - **Polling & timeout:** Poll every 1s, timeout at 24h, cancel on timeout, return `TIMEOUT` state to UI.
