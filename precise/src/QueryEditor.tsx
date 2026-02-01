@@ -17,7 +17,7 @@ interface IQueryEditor {
     enableCatalogSearchColumns?: boolean
 }
 
-const DRAWER_WIDTH = 300
+const DRAWER_WIDTH = 315
 
 const Main = styled('main')(({ theme }) => ({
     minWidth: 0,

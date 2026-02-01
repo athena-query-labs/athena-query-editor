@@ -34,24 +34,15 @@ const CatalogViewerTable: React.FC<CatalogViewerTableProps> = ({
 
     const tablePath = buildPath.table(tableRef.catalogName, tableRef.schemaName, tableRef.tableName)
 
-    // Load columns when expanded OR when there's an active filter
+    // Load columns only when the table node is expanded
     useEffect(() => {
-        if ((isExpanded || filterText) && !table.hasLoadedColumns()) {
-            console.log(`Loading table data for ${tableRef.tableName}`, {
-                isExpanded,
-                filterText,
-                hasColumns: table.getColumns().length > 0,
-            })
-
+        if (isExpanded && !table.hasLoadedColumns()) {
             table.setLoading(true)
             SchemaProvider.getTableWithCache(tableRef, (loadedTable: Table) => {
-                console.log(`Table data loaded for ${tableRef.tableName}`, {
-                    columnCount: loadedTable.getColumns().length,
-                })
                 setTable(loadedTable)
             })
         }
-    }, [isExpanded, filterText, tableRef, table])
+    }, [isExpanded, tableRef, table])
 
     // Check visibility using the passed down helper
     if (!isVisible(tablePath)) {
