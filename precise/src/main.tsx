@@ -79,7 +79,7 @@ export default function App() {
                         whiteSpace: 'nowrap',
                     }}
                 >
-                    Athena query editor - Example app
+                    Athena Query Editor
                 </h1>
                 <Stack direction="row" spacing={0.5} alignItems="center">
                     {themeMode === 'dark' ? (
