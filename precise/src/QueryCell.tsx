@@ -259,35 +259,49 @@ class QueryCell extends React.Component<QueryCellProps, QueryCellState> {
 
         return (
             <Box>
-                <Toolbar sx={{ pl: 1, pr: 0.25, py: 0 }} disableGutters>
-                    <IconButton
+                <Toolbar sx={{ pl: 1, pr: 0.25, py: 0, minWidth: 0 }} disableGutters>
+                    <Box sx={{ display: 'flex', alignItems: 'center', minWidth: 0, flex: 1 }}>
+                        <IconButton
                         color="inherit"
                         title="Catalogs"
                         edge="start"
                         onClick={this.props.onDrawerToggle}
                         sx={[{ mx: 0 }, this.props.drawerOpen && { display: 'none' }]}
+                        >
+                            <MenuIcon />
+                        </IconButton>
+                        <IconButton
+                            color={!isQueryRunning ? 'success' : 'error'}
+                            title={!isQueryRunning ? 'Run query' : 'Stop query'}
+                            onClick={() => this.Execute()}
+                        >
+                            {!isQueryRunning ? <PlayCircleOutlinedIcon /> : <StopCircleOutlinedIcon />}
+                        </IconButton>
+                        {this.renderEditableTextField('editingTitle', currentQuery.title, {
+                            typographyProps: {
+                                variant: 'h6',
+                                noWrap: true,
+                                sx: { ml: 2, minWidth: 0 },
+                            },
+                            textFieldProps: {
+                                sx: { maxWidth: 200 },
+                                onChange: (event) => this.handleTitleChange(event.target.value),
+                            },
+                        })}
+                    </Box>
+                    <Stack
+                        direction="row"
+                        spacing={3}
+                        sx={{
+                            mr: 2,
+                            flexShrink: 0,
+                            minWidth: 0,
+                            flexWrap: 'wrap',
+                            columnGap: 12,
+                            rowGap: 0,
+                        }}
+                        alignItems="baseline"
                     >
-                        <MenuIcon />
-                    </IconButton>
-                    <IconButton
-                        color={!isQueryRunning ? 'success' : 'error'}
-                        title={!isQueryRunning ? 'Run query' : 'Stop query'}
-                        onClick={() => this.Execute()}
-                    >
-                        {!isQueryRunning ? <PlayCircleOutlinedIcon /> : <StopCircleOutlinedIcon />}
-                    </IconButton>
-                    {this.renderEditableTextField('editingTitle', currentQuery.title, {
-                        typographyProps: {
-                            variant: 'h6',
-                            sx: { ml: 2 },
-                        },
-                        textFieldProps: {
-                            sx: { maxWidth: 200 },
-                            onChange: (event) => this.handleTitleChange(event.target.value),
-                        },
-                    })}
-                    <Box sx={{ flexGrow: 1 }} />
-                    <Stack direction="row" spacing={3} sx={{ mr: 2 }} alignItems="baseline">
                         <Stack direction="row" spacing={1}>
                             <Box component="span" sx={{ fontWeight: 600, color: 'text.secondary', mr: 0.5 }}>
                                 Catalog:

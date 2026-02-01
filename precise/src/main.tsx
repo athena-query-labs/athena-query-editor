@@ -57,6 +57,7 @@ export default function App() {
                 height: '100vh',
                 display: 'grid',
                 gridTemplateRows: 'auto 1fr auto',
+                overflowX: 'hidden',
             }}
         >
             <div
@@ -65,9 +66,21 @@ export default function App() {
                     alignItems: 'center',
                     justifyContent: 'space-between',
                     padding: '8px 12px',
+                    minWidth: 0,
                 }}
             >
-                <h1 style={{ margin: 0 }}>Athena query editor - Example app</h1>
+                <h1
+                    style={{
+                        margin: 0,
+                        flex: 1,
+                        minWidth: 0,
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
+                    }}
+                >
+                    Athena query editor - Example app
+                </h1>
                 <Stack direction="row" spacing={0.5} alignItems="center">
                     {themeMode === 'dark' ? (
                         <Brightness4OutlinedIcon fontSize="small" />

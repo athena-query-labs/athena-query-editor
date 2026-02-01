@@ -4,7 +4,9 @@ import {
     Box,
     Button,
     CircularProgress,
+    IconButton,
     Link,
+    Tooltip,
     Typography,
 } from '@mui/material'
 import { DataGrid, GridColDef } from '@mui/x-data-grid'
@@ -12,6 +14,7 @@ import Chip, { ChipProps } from '@mui/material/Chip'
 import ReactDOMServer from 'react-dom/server'
 import CopyLink from './utils/CopyLink'
 import ClearButton from './utils/ClearButton'
+import ContentCopyOutlinedIcon from '@mui/icons-material/ContentCopyOutlined'
 
 interface ResultSetProps {
     queryId: string | undefined
@@ -347,6 +350,23 @@ class ResultSet extends React.Component<ResultSetProps, ResultSetState> {
                     <Chip size="small" label={state} color={this.getQueryStateColor(state)} />
                     {isRunning ? <CircularProgress size={16} /> : null}
                     <Box sx={{ ml: 'auto', display: 'flex', alignItems: 'center', gap: 1, fontSize: '0.8rem' }}>
+                        {queryId ? (
+                            <>
+                                <Typography variant="caption" sx={{ whiteSpace: 'nowrap' }}>
+                                    ID: {queryId}
+                                </Typography>
+                                <Tooltip title="Copy Query ID">
+                                    <IconButton
+                                        size="small"
+                                        onClick={() => {
+                                            void navigator.clipboard.writeText(queryId)
+                                        }}
+                                    >
+                                        <ContentCopyOutlinedIcon fontSize="inherit" />
+                                    </IconButton>
+                                </Tooltip>
+                            </>
+                        ) : null}
                         <Typography variant="caption" sx={{ whiteSpace: 'nowrap' }}>
                             {this.getRowCount()} rows
                         </Typography>
