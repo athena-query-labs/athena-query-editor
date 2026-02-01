@@ -131,23 +131,47 @@ const QueryHistory: React.FC<QueryHistoryProps> = ({ onSelectQuery, onDrawerTogg
                 minWidth: 0,
             }}
         >
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, px: 0.25, pt: 0 }}>
-                <Box sx={{ ml: 'auto', display: 'flex', alignItems: 'center', gap: 1 }}>
-                    {loading && <CircularProgress size={14} />}
-                    <Tooltip title="Refresh">
-                        <IconButton size="small" onClick={load}>
-                            <RefreshOutlinedIcon fontSize="small" />
-                        </IconButton>
-                    </Tooltip>
-                    {onDrawerToggle && (
-                        <Tooltip title="Close drawer">
-                            <IconButton size="small" onClick={onDrawerToggle}>
-                                <ChevronLeftIcon fontSize="small" />
+            <Box
+                sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    width: '100%',
+                    minHeight: (theme) => `calc(${theme.mixins.toolbar.minHeight}px - ${theme.spacing(0.5)})`,
+                    px: 0,
+                    py: 0,
+                }}
+            >
+                <Box
+                    sx={{
+                        display: 'flex',
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        gap: 0,
+                        width: '100%',
+                        px: 1,
+                        py: 0,
+                    }}
+                >
+                    <Box sx={{ ml: 'auto', display: 'flex', alignItems: 'center', gap: 1 }}>
+                        {loading && <CircularProgress size={14} />}
+                        <Tooltip title="Refresh">
+                            <IconButton size="small" onClick={load}>
+                                <RefreshOutlinedIcon sx={{ fontSize: '1.2rem' }} />
                             </IconButton>
                         </Tooltip>
-                    )}
+                        {onDrawerToggle && (
+                            <Tooltip title="Close drawer">
+                                <IconButton size="small" onClick={onDrawerToggle}>
+                                    <ChevronLeftIcon sx={{ fontSize: '1.2rem' }} />
+                                </IconButton>
+                            </Tooltip>
+                        )}
+                    </Box>
                 </Box>
             </Box>
+            <Divider sx={{ mx: 1 }} />
             <List dense sx={{ flex: 1, minHeight: 0, overflowY: 'auto', minWidth: 0, py: 0 }}>
                 {items.map((item) => (
                     <React.Fragment key={item.query_execution_id}>
