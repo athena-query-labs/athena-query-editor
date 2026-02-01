@@ -12,9 +12,11 @@ import {
     CircularProgress,
 } from '@mui/material'
 import RefreshOutlinedIcon from '@mui/icons-material/RefreshOutlined'
+import ChevronLeftIcon from '@mui/icons-material/ChevronLeft'
 import ContentCopyOutlinedIcon from '@mui/icons-material/ContentCopyOutlined'
 import ExpandMoreOutlinedIcon from '@mui/icons-material/ExpandMoreOutlined'
 import ExpandLessOutlinedIcon from '@mui/icons-material/ExpandLessOutlined'
+import NumbersOutlinedIcon from '@mui/icons-material/NumbersOutlined'
 
 interface HistoryItem {
     query_execution_id: string
@@ -35,6 +37,7 @@ interface HistoryItem {
 
 interface QueryHistoryProps {
     onSelectQuery: (sql: string, catalog?: string | null, database?: string | null) => void
+    onDrawerToggle?: () => void
 }
 
 const statusColor: Record<string, 'default' | 'success' | 'warning' | 'error' | 'info'> = {
@@ -45,19 +48,13 @@ const statusColor: Record<string, 'default' | 'success' | 'warning' | 'error' | 
     RUNNING: 'info',
     QUEUED: 'default',
 }
-const statusLabel: Record<string, string> = {
-    SUCCEEDED: 'S',
-    FAILED: 'F',
-    CANCELLED: 'C',
-    TIMEOUT: 'T',
-    RUNNING: 'R',
-    QUEUED: 'Q',
-}
 
-const QueryHistory: React.FC<QueryHistoryProps> = ({ onSelectQuery }) => {
+const QueryHistory: React.FC<QueryHistoryProps> = ({ onSelectQuery, onDrawerToggle }) => {
     const [items, setItems] = useState<HistoryItem[]>([])
     const [loading, setLoading] = useState(false)
     const [expandedId, setExpandedId] = useState<string | null>(null)
+    const [copiedId, setCopiedId] = useState<string | null>(null)
+    const [copiedSqlId, setCopiedSqlId] = useState<string | null>(null)
 
     const load = async () => {
         setLoading(true)
@@ -77,6 +74,20 @@ const QueryHistory: React.FC<QueryHistoryProps> = ({ onSelectQuery }) => {
         } finally {
             setLoading(false)
         }
+    }
+
+    const handleCopyId = (event: React.MouseEvent, id: string) => {
+        event.stopPropagation()
+        void navigator.clipboard.writeText(id)
+        setCopiedId(id)
+        window.setTimeout(() => setCopiedId((current) => (current === id ? null : current)), 1200)
+    }
+
+    const handleCopySql = (event: React.MouseEvent, id: string, sql: string) => {
+        event.stopPropagation()
+        void navigator.clipboard.writeText(sql)
+        setCopiedSqlId(id)
+        window.setTimeout(() => setCopiedSqlId((current) => (current === id ? null : current)), 1200)
     }
 
     useEffect(() => {
@@ -113,9 +124,17 @@ const QueryHistory: React.FC<QueryHistoryProps> = ({ onSelectQuery }) => {
     }
 
     return (
-        <Box sx={{ px: 1, pt: 1, display: 'flex', flexDirection: 'column', height: '100%' }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <Typography variant="subtitle2">Query History</Typography>
+        <Box
+            sx={{
+                px: 0,
+                pt: 0,
+                display: 'flex',
+                flexDirection: 'column',
+                height: '100%',
+                minWidth: 0,
+            }}
+        >
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, px: 0.25, pt: 0 }}>
                 <Box sx={{ ml: 'auto', display: 'flex', alignItems: 'center', gap: 1 }}>
                     {loading && <CircularProgress size={14} />}
                     <Tooltip title="Refresh">
@@ -123,68 +142,81 @@ const QueryHistory: React.FC<QueryHistoryProps> = ({ onSelectQuery }) => {
                             <RefreshOutlinedIcon fontSize="small" />
                         </IconButton>
                     </Tooltip>
+                    {onDrawerToggle && (
+                        <Tooltip title="Close drawer">
+                            <IconButton size="small" onClick={onDrawerToggle}>
+                                <ChevronLeftIcon fontSize="small" />
+                            </IconButton>
+                        </Tooltip>
+                    )}
                 </Box>
             </Box>
-            <List dense sx={{ flex: 1, minHeight: 240, overflowY: 'auto' }}>
+            <List dense sx={{ flex: 1, minHeight: 240, overflowY: 'auto', minWidth: 0, py: 0 }}>
                 {items.map((item) => (
                     <ListItem
                         key={item.query_execution_id}
                         onClick={() => onSelectQuery(item.sql_text, item.catalog, item.database_name)}
-                        sx={{ cursor: 'pointer', py: 0.5, alignItems: 'flex-start' }}
+                        sx={{ cursor: 'pointer', py: 0.05, alignItems: 'flex-start' }}
                     >
                         <ListItemText
                             primary={
-                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, minWidth: 0 }}>
                                     <Chip
                                         size="small"
                                         variant="outlined"
-                                        label={statusLabel[item.status] || item.status}
+                                        label={item.status}
                                         color={statusColor[item.status] || 'default'}
                                         sx={{
-                                            height: 14,
-                                            fontSize: '0.55rem',
-                                            '& .MuiChip-label': { px: 0.4, lineHeight: 1 },
+                                            height: 18,
+                                            minWidth: 70,
+                                            fontSize: '0.36rem',
+                                            fontFamily: 'monospace',
+                                            '& .MuiChip-label': {
+                                                px: 0.7,
+                                                lineHeight: 1.3,
+                                                width: '100%',
+                                                textAlign: 'center',
+                                            },
                                         }}
                                     />
                                     <Typography variant="caption" color="text.secondary" sx={{ whiteSpace: 'nowrap' }}>
                                         {formatSubmittedAt(item.submitted_at)}
                                     </Typography>
-                                    <Box sx={{ ml: 'auto', display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                        <Tooltip title="Copy SQL">
-                                            <IconButton
-                                                size="small"
-                                                onClick={(event) => {
-                                                    event.stopPropagation()
-                                                    void navigator.clipboard.writeText(item.sql_text)
-                                                }}
-                                                sx={{ p: 0.25 }}
-                                            >
-                                                <ContentCopyOutlinedIcon sx={{ fontSize: 14 }} />
-                                            </IconButton>
-                                        </Tooltip>
-                                        <Tooltip title={expandedId === item.query_execution_id ? 'Collapse' : 'Expand'}>
-                                            <IconButton
-                                                size="small"
-                                                onClick={(event) => {
-                                                    event.stopPropagation()
-                                                    setExpandedId((current) =>
-                                                        current === item.query_execution_id ? null : item.query_execution_id
-                                                    )
-                                                }}
-                                                sx={{ p: 0.25 }}
-                                            >
-                                                {expandedId === item.query_execution_id ? (
-                                                    <ExpandLessOutlinedIcon sx={{ fontSize: 16 }} />
-                                                ) : (
-                                                    <ExpandMoreOutlinedIcon sx={{ fontSize: 16 }} />
-                                                )}
-                                            </IconButton>
-                                        </Tooltip>
-                                    </Box>
                                 </Box>
                             }
                             secondary={
-                                <Box sx={{ mt: 0.25, display: 'flex', flexDirection: 'column', gap: 0.25 }}>
+                                <Box sx={{ mt: 0.05, display: 'flex', flexDirection: 'column', gap: 0.1 }}>
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.25, minWidth: 0 }}>
+                                        <NumbersOutlinedIcon
+                                            sx={{
+                                                fontSize: 12,
+                                                color: 'text.disabled',
+                                                transform: 'rotate(-18deg)',
+                                            }}
+                                        />
+                                        <Tooltip title={item.query_execution_id} placement="right">
+                                            <Typography
+                                                variant="caption"
+                                                color="text.secondary"
+                                                noWrap
+                                                onClick={(event) => handleCopyId(event, item.query_execution_id)}
+                                                sx={{
+                                                    flex: 1,
+                                                    minWidth: 0,
+                                                    fontSize: '0.2rem',
+                                                    fontFamily: 'monospace',
+                                                    cursor: 'pointer',
+                                                    transition: 'color 120ms ease',
+                                                    color:
+                                                        copiedId === item.query_execution_id
+                                                            ? 'success.main'
+                                                            : 'text.secondary',
+                                                }}
+                                            >
+                                                {item.query_execution_id}
+                                            </Typography>
+                                        </Tooltip>
+                                    </Box>
                                     <Tooltip
                                         title={
                                             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.25 }}>
@@ -210,7 +242,7 @@ const QueryHistory: React.FC<QueryHistoryProps> = ({ onSelectQuery }) => {
                                         }
                                         placement="right"
                                     >
-                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
+                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, flexWrap: 'wrap' }}>
                                             <Typography variant="caption" color="text.secondary" sx={{ whiteSpace: 'nowrap' }}>
                                                 Q {formatSeconds(item.stats?.queueTimeSeconds)}
                                             </Typography>
@@ -225,25 +257,63 @@ const QueryHistory: React.FC<QueryHistoryProps> = ({ onSelectQuery }) => {
                                             </Typography>
                                         </Box>
                                     </Tooltip>
-                                    {expandedId !== item.query_execution_id && (
-                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.35, minWidth: 0 }}>
+                                        {expandedId !== item.query_execution_id ? (
                                             <Tooltip
                                                 title={<Typography variant="caption">{item.sql_text}</Typography>}
                                                 placement="right"
                                             >
-                                                <Typography variant="caption" noWrap sx={{ maxWidth: 420 }}>
+                                                <Typography variant="caption" noWrap sx={{ maxWidth: 420, minWidth: 0 }}>
                                                     {item.sql_text}
                                                 </Typography>
                                             </Tooltip>
-                                        </Box>
-                                    )}
-                                    {expandedId === item.query_execution_id && (
-                                        <Box sx={{ mt: 0.25 }}>
+                                        ) : (
                                             <Typography variant="caption" sx={{ whiteSpace: 'pre-wrap' }}>
                                                 {item.sql_text}
                                             </Typography>
+                                        )}
+                                        <Box
+                                            sx={{
+                                                ml: 'auto',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                gap: 0.5,
+                                                flexShrink: 0,
+                                            }}
+                                        >
+                                            <Tooltip title={copiedSqlId === item.query_execution_id ? 'Copied' : 'Copy SQL'}>
+                                                <IconButton
+                                                    size="small"
+                                                    onClick={(event) =>
+                                                        handleCopySql(event, item.query_execution_id, item.sql_text)
+                                                    }
+                                                    sx={{ p: 0.25 }}
+                                                >
+                                                    <ContentCopyOutlinedIcon sx={{ fontSize: 14 }} />
+                                                </IconButton>
+                                            </Tooltip>
+                                            <Tooltip
+                                                title={expandedId === item.query_execution_id ? 'Collapse' : 'Expand'}
+                                            >
+                                                <IconButton
+                                                    size="small"
+                                                    onClick={(event) => {
+                                                        event.stopPropagation()
+                                                        setExpandedId((current) =>
+                                                            current === item.query_execution_id ? null : item.query_execution_id
+                                                        )
+                                                    }}
+                                                    sx={{ p: 0.25 }}
+                                                >
+                                                    {expandedId === item.query_execution_id ? (
+                                                        <ExpandLessOutlinedIcon sx={{ fontSize: 16 }} />
+                                                    ) : (
+                                                        <ExpandMoreOutlinedIcon sx={{ fontSize: 16 }} />
+                                                    )}
+                                                </IconButton>
+                                            </Tooltip>
                                         </Box>
-                                    )}
+                                    </Box>
                                 </Box>
                             }
                             primaryTypographyProps={{ component: 'div' }}
