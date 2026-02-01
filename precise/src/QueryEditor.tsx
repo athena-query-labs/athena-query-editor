@@ -114,14 +114,9 @@ export const QueryEditor = ({ height, theme, enableCatalogSearchColumns }: IQuer
                     sx={{
                         gridColumn: 1,
                         flexShrink: 0,
+                        height: '100%',
+                        minHeight: 0,
                         pointerEvents: drawerOpen ? 'auto' : 'none',
-                        '& .MuiDrawer-paper': {
-                            width: '100%',
-                            boxSizing: 'border-box',
-                            overflowX: 'hidden',
-                            height: '100%',
-                            position: 'static',
-                        },
                     }}
                     variant="persistent"
                     anchor="left"
@@ -133,35 +128,54 @@ export const QueryEditor = ({ height, theme, enableCatalogSearchColumns }: IQuer
                     slotProps={{
                         paper: {
                             sx: {
+                                width: '100%',
+                                boxSizing: 'border-box',
                                 position: 'static',
                                 display: 'flex',
                                 flexDirection: 'column',
                                 overflow: 'hidden',
+                                minHeight: 0,
+                                height: '100%',
                             },
                         },
                     }}
                 >
-                    <Tabs
-                        value={drawerTab}
-                        onChange={(_, value) => setDrawerTab(value)}
-                        variant="fullWidth"
-                        sx={{ borderBottom: 1, borderColor: 'divider' }}
-                    >
-                        <Tab value="catalog" label="Catalog" />
-                        <Tab value="history" label="History" />
-                    </Tabs>
-                    <Box sx={{ display: drawerTab === 'history' ? 'flex' : 'none', flex: 1, minHeight: 0 }}>
-                        <QueryHistory onSelectQuery={setQueryContent} onDrawerToggle={() => setDrawerOpen(false)} />
-                    </Box>
-                    <Box sx={{ display: drawerTab === 'catalog' ? 'flex' : 'none', flex: 1, minHeight: 0 }}>
-                        <CatalogViewer
-                            onGenerateQuery={setQueryContent}
-                            onAppendQuery={appendQueryContent}
-                            onDrawerToggle={() => setDrawerOpen(false)}
-                            enableSearchColumns={enableSearchColumns}
-                            currentCatalog={currentQuery.catalog}
-                            currentSchema={currentQuery.schema}
-                        />
+                    <Box sx={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0 }}>
+                        <Tabs
+                            value={drawerTab}
+                            onChange={(_, value) => setDrawerTab(value)}
+                            variant="fullWidth"
+                            sx={{ borderBottom: 1, borderColor: 'divider', flexShrink: 0 }}
+                        >
+                            <Tab value="catalog" label="Catalog" />
+                            <Tab value="history" label="History" />
+                        </Tabs>
+                        <Box sx={{ flex: 1, minHeight: 0, overflowY: 'auto' }}>
+                            <Box
+                                sx={{
+                                    display: drawerTab === 'history' ? 'flex' : 'none',
+                                }}
+                            >
+                                <QueryHistory
+                                    onSelectQuery={setQueryContent}
+                                    onDrawerToggle={() => setDrawerOpen(false)}
+                                />
+                            </Box>
+                            <Box
+                                sx={{
+                                    display: drawerTab === 'catalog' ? 'flex' : 'none',
+                                }}
+                            >
+                                <CatalogViewer
+                                    onGenerateQuery={setQueryContent}
+                                    onAppendQuery={appendQueryContent}
+                                    onDrawerToggle={() => setDrawerOpen(false)}
+                                    enableSearchColumns={enableSearchColumns}
+                                    currentCatalog={currentQuery.catalog}
+                                    currentSchema={currentQuery.schema}
+                                />
+                            </Box>
+                        </Box>
                     </Box>
                 </Drawer>
 
