@@ -1,14 +1,5 @@
 import React from 'react'
-import {
-    Alert,
-    Box,
-    Button,
-    CircularProgress,
-    IconButton,
-    Link,
-    Tooltip,
-    Typography,
-} from '@mui/material'
+import { Alert, Box, Button, CircularProgress, IconButton, Link, Tooltip, Typography } from '@mui/material'
 import { DataGrid, GridColDef } from '@mui/x-data-grid'
 import Chip, { ChipProps } from '@mui/material/Chip'
 import ReactDOMServer from 'react-dom/server'
@@ -387,9 +378,7 @@ class ResultSet extends React.Component<ResultSetProps, ResultSetState> {
                     <Typography variant="caption">Scanned: {stats.scannedGB ?? '-'} GB</Typography>
                     <Typography variant="caption">
                         Cost:{' '}
-                        {stats.estimatedCost
-                            ? `${stats.estimatedCost.amount} ${stats.estimatedCost.currency}`
-                            : '-'}
+                        {stats.estimatedCost ? `${stats.estimatedCost.amount} ${stats.estimatedCost.currency}` : '-'}
                     </Typography>
                     <Box sx={{ ml: 'auto', display: 'flex', alignItems: 'center', gap: 1 }}>
                         <Button

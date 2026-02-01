@@ -319,9 +319,7 @@ class QueryEditorPane extends React.Component<QueryEditorPaneProps, QueryEditorP
             const parseLine = parseLines[caretPosition.lineNumber - 1] ?? ''
             const caretColumn = Math.min(caretPosition.column, parseLine.length + 1)
             const newLine =
-                parseLine.substring(0, caretColumn - 1) +
-                phantomKeyword +
-                parseLine.substring(caretColumn - 1)
+                parseLine.substring(0, caretColumn - 1) + phantomKeyword + parseLine.substring(caretColumn - 1)
             const newText =
                 parseLines.slice(0, caretPosition.lineNumber - 1).join('\n') +
                 newLine +

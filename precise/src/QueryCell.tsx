@@ -117,7 +117,6 @@ class QueryCell extends React.Component<QueryCellProps, QueryCellState> {
         this.queryRunner.SetStarted = () => {
             this.QueryStarted()
         }
-
     }
 
     setRunningQueryId = (queryId: string | null) => {
@@ -262,11 +261,11 @@ class QueryCell extends React.Component<QueryCellProps, QueryCellState> {
                 <Toolbar sx={{ pl: 1, pr: 0.25, py: 0, minWidth: 0 }} disableGutters>
                     <Box sx={{ display: 'flex', alignItems: 'center', minWidth: 0, flex: 1 }}>
                         <IconButton
-                        color="inherit"
-                        title="Catalogs"
-                        edge="start"
-                        onClick={this.props.onDrawerToggle}
-                        sx={[{ mx: 0 }, this.props.drawerOpen && { display: 'none' }]}
+                            color="inherit"
+                            title="Catalogs"
+                            edge="start"
+                            onClick={this.props.onDrawerToggle}
+                            sx={[{ mx: 0 }, this.props.drawerOpen && { display: 'none' }]}
                         >
                             <MenuIcon />
                         </IconButton>
