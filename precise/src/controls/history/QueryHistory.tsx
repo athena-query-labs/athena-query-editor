@@ -97,15 +97,10 @@ const QueryHistory: React.FC<QueryHistoryProps> = ({ onSelectQuery, onDrawerTogg
     const formatSubmittedAt = (value: string) => {
         const date = new Date(value)
         if (Number.isNaN(date.getTime())) return value
-        return date.toLocaleString(undefined, {
-            hour12: false,
-            year: 'numeric',
-            month: '2-digit',
-            day: '2-digit',
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit',
-        })
+        const pad = (value: number) => value.toString().padStart(2, '0')
+        return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(
+            date.getHours()
+        )}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`
     }
 
     const formatSeconds = (value: number | null | undefined) => {
@@ -131,6 +126,8 @@ const QueryHistory: React.FC<QueryHistoryProps> = ({ onSelectQuery, onDrawerTogg
                 display: 'flex',
                 flexDirection: 'column',
                 height: '100%',
+                flex: 1,
+                minHeight: 0,
                 minWidth: 0,
             }}
         >
@@ -151,175 +148,183 @@ const QueryHistory: React.FC<QueryHistoryProps> = ({ onSelectQuery, onDrawerTogg
                     )}
                 </Box>
             </Box>
-            <List dense sx={{ flex: 1, minHeight: 240, overflowY: 'auto', minWidth: 0, py: 0 }}>
+            <List dense sx={{ minWidth: 0, py: 0 }}>
                 {items.map((item) => (
-                    <ListItem
-                        key={item.query_execution_id}
-                        onClick={() => onSelectQuery(item.sql_text, item.catalog, item.database_name)}
-                        sx={{ cursor: 'pointer', py: 0.05, alignItems: 'flex-start' }}
-                    >
-                        <ListItemText
-                            primary={
-                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, minWidth: 0 }}>
-                                    <Chip
-                                        size="small"
-                                        variant="outlined"
-                                        label={item.status}
-                                        color={statusColor[item.status] || 'default'}
-                                        sx={{
-                                            height: 18,
-                                            minWidth: 70,
-                                            fontSize: '0.36rem',
-                                            fontFamily: 'monospace',
-                                            '& .MuiChip-label': {
-                                                px: 0.7,
-                                                lineHeight: 1.3,
-                                                width: '100%',
-                                                textAlign: 'center',
-                                            },
-                                        }}
-                                    />
-                                    <Typography variant="caption" color="text.secondary" sx={{ whiteSpace: 'nowrap' }}>
-                                        {formatSubmittedAt(item.submitted_at)}
-                                    </Typography>
-                                </Box>
-                            }
-                            secondary={
-                                <Box sx={{ mt: 0.05, display: 'flex', flexDirection: 'column', gap: 0.1 }}>
-                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.25, minWidth: 0 }}>
-                                        <NumbersOutlinedIcon
-                                            sx={{
-                                                fontSize: 12,
-                                                color: 'text.disabled',
-                                                transform: 'rotate(-18deg)',
-                                            }}
-                                        />
-                                        <Tooltip title={item.query_execution_id} placement="right">
-                                            <Typography
-                                                variant="caption"
-                                                color="text.secondary"
-                                                noWrap
-                                                onClick={(event) => handleCopyId(event, item.query_execution_id)}
+                    <React.Fragment key={item.query_execution_id}>
+                        <ListItem
+                            onClick={() => onSelectQuery(item.sql_text, item.catalog, item.database_name)}
+                            sx={{ cursor: 'pointer', py: 0.05, alignItems: 'flex-start' }}
+                        >
+                            <ListItemText
+                                primary={
+                                    <Box sx={{ mt: 0.05, display: 'flex', flexDirection: 'column', gap: 0.1 }}>
+                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.25, minWidth: 0 }}>
+                                            <NumbersOutlinedIcon
                                                 sx={{
-                                                    flex: 1,
-                                                    minWidth: 0,
-                                                    fontSize: '0.2rem',
+                                                    fontSize: 12,
+                                                    color: 'text.disabled',
+                                                    transform: 'rotate(-18deg)',
+                                                }}
+                                            />
+                                            <Tooltip title={item.query_execution_id} placement="right">
+                                                <Typography
+                                                    variant="caption"
+                                                    color="text.secondary"
+                                                    noWrap
+                                                    onClick={(event) => handleCopyId(event, item.query_execution_id)}
+                                                    sx={{
+                                                        flex: 1,
+                                                        minWidth: 0,
+                                                        fontSize: '0.2rem',
+                                                        fontFamily: 'monospace',
+                                                        cursor: 'pointer',
+                                                        transition: 'color 120ms ease',
+                                                        color:
+                                                            copiedId === item.query_execution_id
+                                                                ? 'success.main'
+                                                                : 'text.secondary',
+                                                    }}
+                                                >
+                                                    {item.query_execution_id}
+                                                </Typography>
+                                            </Tooltip>
+                                        </Box>
+                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, minWidth: 0 }}>
+                                            <Chip
+                                                size="small"
+                                                variant="outlined"
+                                                label={item.status}
+                                                color={statusColor[item.status] || 'default'}
+                                                sx={{
+                                                    height: 18,
+                                                    minWidth: 70,
+                                                    fontSize: '0.36rem',
                                                     fontFamily: 'monospace',
-                                                    cursor: 'pointer',
-                                                    transition: 'color 120ms ease',
-                                                    color:
-                                                        copiedId === item.query_execution_id
-                                                            ? 'success.main'
-                                                            : 'text.secondary',
+                                                    '& .MuiChip-label': {
+                                                        px: 0.7,
+                                                        lineHeight: 1.3,
+                                                        width: '100%',
+                                                        textAlign: 'center',
+                                                    },
+                                                }}
+                                            />
+                                            <Typography variant="caption" color="text.secondary" sx={{ whiteSpace: 'nowrap' }}>
+                                                {formatSubmittedAt(item.submitted_at)}
+                                            </Typography>
+                                            <Box
+                                                sx={{
+                                                    ml: 'auto',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    gap: 0.5,
+                                                    flexShrink: 0,
                                                 }}
                                             >
-                                                {item.query_execution_id}
-                                            </Typography>
-                                        </Tooltip>
-                                    </Box>
-                                    <Tooltip
-                                        title={
-                                            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.25 }}>
-                                                <Typography variant="caption">
-                                                    {`Status: ${item.status}`}
-                                                </Typography>
-                                                <Typography variant="caption">
-                                                    {`Start: ${formatSubmittedAt(item.submitted_at)}`}
-                                                </Typography>
-                                                <Typography variant="caption">
-                                                    {`Queue Time: ${formatSeconds(item.stats?.queueTimeSeconds)}`}
-                                                </Typography>
-                                                <Typography variant="caption">
-                                                    {`Execution Time: ${formatSeconds(item.stats?.executionTimeSeconds)}`}
-                                                </Typography>
-                                                <Typography variant="caption">
-                                                    {`Scanned: ${formatGB(item.stats?.scannedGB)}`}
-                                                </Typography>
-                                                <Typography variant="caption">
-                                                    {`Cost: ${formatCost(item.stats?.estimatedCost)}`}
-                                                </Typography>
+                                                <Tooltip title={copiedSqlId === item.query_execution_id ? 'Copied' : 'Copy SQL'}>
+                                                    <IconButton
+                                                        size="small"
+                                                        onClick={(event) =>
+                                                            handleCopySql(event, item.query_execution_id, item.sql_text)
+                                                        }
+                                                        sx={{ p: 0.25 }}
+                                                    >
+                                                        <ContentCopyOutlinedIcon sx={{ fontSize: 14 }} />
+                                                    </IconButton>
+                                                </Tooltip>
+                                                <Tooltip
+                                                    title={expandedId === item.query_execution_id ? 'Collapse' : 'Expand'}
+                                                >
+                                                    <IconButton
+                                                        size="small"
+                                                        onClick={(event) => {
+                                                            event.stopPropagation()
+                                                            setExpandedId((current) =>
+                                                                current === item.query_execution_id
+                                                                    ? null
+                                                                    : item.query_execution_id
+                                                            )
+                                                        }}
+                                                        sx={{ p: 0.25 }}
+                                                    >
+                                                        {expandedId === item.query_execution_id ? (
+                                                            <ExpandLessOutlinedIcon sx={{ fontSize: 16 }} />
+                                                        ) : (
+                                                            <ExpandMoreOutlinedIcon sx={{ fontSize: 16 }} />
+                                                        )}
+                                                    </IconButton>
+                                                </Tooltip>
                                             </Box>
-                                        }
-                                        placement="right"
-                                    >
-                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, flexWrap: 'wrap' }}>
-                                            <Typography variant="caption" color="text.secondary" sx={{ whiteSpace: 'nowrap' }}>
-                                                Q {formatSeconds(item.stats?.queueTimeSeconds)}
-                                            </Typography>
-                                            <Typography variant="caption" color="text.secondary" sx={{ whiteSpace: 'nowrap' }}>
-                                                E {formatSeconds(item.stats?.executionTimeSeconds)}
-                                            </Typography>
-                                            <Typography variant="caption" color="text.secondary" sx={{ whiteSpace: 'nowrap' }}>
-                                                S {formatGB(item.stats?.scannedGB)}
-                                            </Typography>
-                                            <Typography variant="caption" color="text.secondary" sx={{ whiteSpace: 'nowrap' }}>
-                                                C {formatCost(item.stats?.estimatedCost)}
-                                            </Typography>
                                         </Box>
-                                    </Tooltip>
-                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.35, minWidth: 0 }}>
-                                        {expandedId !== item.query_execution_id ? (
-                                            <Tooltip
-                                                title={<Typography variant="caption">{item.sql_text}</Typography>}
-                                                placement="right"
-                                            >
-                                                <Typography variant="caption" noWrap sx={{ maxWidth: 420, minWidth: 0 }}>
+                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.35, minWidth: 0 }}>
+                                            {expandedId !== item.query_execution_id ? (
+                                                <Tooltip
+                                                    title={<Typography variant="caption">{item.sql_text}</Typography>}
+                                                    placement="right"
+                                                >
+                                                    <Typography variant="caption" noWrap sx={{ maxWidth: 420, minWidth: 0 }}>
+                                                        {item.sql_text}
+                                                    </Typography>
+                                                </Tooltip>
+                                            ) : (
+                                                <Typography variant="caption" sx={{ whiteSpace: 'pre-wrap' }}>
                                                     {item.sql_text}
                                                 </Typography>
-                                            </Tooltip>
-                                        ) : (
-                                            <Typography variant="caption" sx={{ whiteSpace: 'pre-wrap' }}>
-                                                {item.sql_text}
-                                            </Typography>
-                                        )}
-                                        <Box
-                                            sx={{
-                                                ml: 'auto',
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                gap: 0.5,
-                                                flexShrink: 0,
-                                            }}
-                                        >
-                                            <Tooltip title={copiedSqlId === item.query_execution_id ? 'Copied' : 'Copy SQL'}>
-                                                <IconButton
-                                                    size="small"
-                                                    onClick={(event) =>
-                                                        handleCopySql(event, item.query_execution_id, item.sql_text)
-                                                    }
-                                                    sx={{ p: 0.25 }}
-                                                >
-                                                    <ContentCopyOutlinedIcon sx={{ fontSize: 14 }} />
-                                                </IconButton>
-                                            </Tooltip>
-                                            <Tooltip
-                                                title={expandedId === item.query_execution_id ? 'Collapse' : 'Expand'}
-                                            >
-                                                <IconButton
-                                                    size="small"
-                                                    onClick={(event) => {
-                                                        event.stopPropagation()
-                                                        setExpandedId((current) =>
-                                                            current === item.query_execution_id ? null : item.query_execution_id
-                                                        )
-                                                    }}
-                                                    sx={{ p: 0.25 }}
-                                                >
-                                                    {expandedId === item.query_execution_id ? (
-                                                        <ExpandLessOutlinedIcon sx={{ fontSize: 16 }} />
-                                                    ) : (
-                                                        <ExpandMoreOutlinedIcon sx={{ fontSize: 16 }} />
-                                                    )}
-                                                </IconButton>
-                                            </Tooltip>
+                                            )}
                                         </Box>
+                                        <Tooltip
+                                            title={
+                                                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.25 }}>
+                                                    <Typography variant="caption">
+                                                        {`Status: ${item.status}`}
+                                                    </Typography>
+                                                    <Typography variant="caption">
+                                                        {`Start: ${formatSubmittedAt(item.submitted_at)}`}
+                                                    </Typography>
+                                                    <Typography variant="caption">
+                                                        {`Queue Time: ${formatSeconds(item.stats?.queueTimeSeconds)}`}
+                                                    </Typography>
+                                                    <Typography variant="caption">
+                                                        {`Execution Time: ${formatSeconds(item.stats?.executionTimeSeconds)}`}
+                                                    </Typography>
+                                                    <Typography variant="caption">
+                                                        {`Scanned: ${formatGB(item.stats?.scannedGB)}`}
+                                                    </Typography>
+                                                    <Typography variant="caption">
+                                                        {`Cost: ${formatCost(item.stats?.estimatedCost)}`}
+                                                    </Typography>
+                                                </Box>
+                                            }
+                                            placement="right"
+                                        >
+                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, flexWrap: 'wrap' }}>
+                                                <Typography variant="caption" color="text.secondary" sx={{ whiteSpace: 'nowrap' }}>
+                                                    Q {formatSeconds(item.stats?.queueTimeSeconds)}
+                                                </Typography>
+                                                <Typography variant="caption" color="text.secondary" sx={{ whiteSpace: 'nowrap' }}>
+                                                    E {formatSeconds(item.stats?.executionTimeSeconds)}
+                                                </Typography>
+                                                <Typography variant="caption" color="text.secondary" sx={{ whiteSpace: 'nowrap' }}>
+                                                    S {formatGB(item.stats?.scannedGB)}
+                                                </Typography>
+                                                <Typography variant="caption" color="text.secondary" sx={{ whiteSpace: 'nowrap' }}>
+                                                    C {formatCost(item.stats?.estimatedCost)}
+                                                </Typography>
+                                            </Box>
+                                        </Tooltip>
                                     </Box>
-                                </Box>
-                            }
+                                }
                             primaryTypographyProps={{ component: 'div' }}
-                            secondaryTypographyProps={{ component: 'div' }}
                         />
                     </ListItem>
+                        <Divider
+                            sx={{
+                                my: 0.35,
+                                opacity: 1,
+                                borderColor: 'text.primary',
+                                mx: 1,
+                            }}
+                        />
+                    </React.Fragment>
                 ))}
             </List>
             <Divider />
