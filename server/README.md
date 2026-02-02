@@ -71,6 +71,10 @@ The metadata routes proxy directly to Athena APIs:
 
 Apply `migrations/001_create_query_history.sql` to provision query history storage.
 
+## Architecture decisions
+
+See `docs/adr/README.md` for decision records that apply to the backend.
+
 ## Run (dev)
 
 ```
