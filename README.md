@@ -281,3 +281,94 @@ The approach:
 * Parameters and string replacement are only partly implemented in
   `SubstitutionEditor` and should support both SQL parameters and string
   replacement.
+
+## Docker & GHCR
+
+A single production image packages the backend and built frontend assets.
+
+### Build locally
+
+```bash
+docker build -t athena-query-editor:local .
+```
+
+### Run locally
+
+```bash
+docker run --rm -p 8081:8081 \
+  -e AWS_REGION=ap-east-1 \
+  -e ATHENA_WORKGROUP=primary \
+  -e ATHENA_OUTPUT_LOCATION=s3://your-bucket/path/ \
+  -e DATABASE_URL=postgresql://postgres:postgres@host.docker.internal:5432/athena_query \
+  athena-query-editor:local
+```
+
+### GHCR images
+
+Images are published to:
+
+```
+ghcr.io/athena-query-labs/athena-query-editor
+```
+
+Tag rules:
+- `latest` on pushes to `main`
+- `vX.Y.Z` on GitHub release tags
+Arm64 builds use GitHub-hosted `ubuntu-24.04-arm` runners.
+
+### Kubernetes notes
+
+- The container listens on port `8081`.
+- Set required env vars: `AWS_REGION`, `ATHENA_WORKGROUP`, `ATHENA_OUTPUT_LOCATION`, `DATABASE_URL`.
+- Mount or bake `config/athena-pricing.json` if you customize pricing.
+
+Example deployment:
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: athena-query-editor
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: athena-query-editor
+  template:
+    metadata:
+      labels:
+        app: athena-query-editor
+    spec:
+      containers:
+        - name: athena-query-editor
+          image: ghcr.io/athena-query-labs/athena-query-editor:latest
+          ports:
+            - containerPort: 8081
+          env:
+            - name: AWS_REGION
+              value: ap-east-1
+            - name: ATHENA_WORKGROUP
+              value: primary
+            - name: ATHENA_OUTPUT_LOCATION
+              value: s3://your-bucket/path/
+            - name: DATABASE_URL
+              value: postgresql://postgres:postgres@postgres.default.svc.cluster.local:5432/athena_query
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: athena-query-editor
+spec:
+  selector:
+    app: athena-query-editor
+  ports:
+    - port: 8081
+      targetPort: 8081
+  type: ClusterIP
+```
+
+### Multi-arch build verification
+
+```bash
+docker buildx imagetools inspect ghcr.io/athena-query-labs/athena-query-editor:latest
+```

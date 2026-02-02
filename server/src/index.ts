@@ -1,4 +1,6 @@
 import 'dotenv/config'
+import fs from 'node:fs'
+import path from 'node:path'
 import express, { Request, Response, NextFunction } from 'express'
 import { loadConfig } from './config.js'
 import { createAthenaClient, createS3Client } from './aws.js'
@@ -17,6 +19,11 @@ const app = express()
 app.use(express.json({ limit: '1mb' }))
 app.use(requireUser)
 
+const staticRoot = path.join(process.cwd(), 'public')
+if (fs.existsSync(staticRoot)) {
+  app.use(express.static(staticRoot))
+}
+
 app.get('/health', (_req, res) => {
   res.json({ ok: true })
 })
@@ -24,6 +31,12 @@ app.get('/health', (_req, res) => {
 app.use('/api/query', createQueryRouter(config, athena, s3, pool))
 app.use('/api/metadata', createMetadataRouter(config, athena))
 app.use('/api/history', createHistoryRouter(pool))
+
+if (fs.existsSync(staticRoot)) {
+  app.get('*', (_req, res) => {
+    res.sendFile(path.join(staticRoot, 'index.html'))
+  })
+}
 
 app.use((err: unknown, _req: Request, res: Response, _next: NextFunction) => {
   const message = err instanceof Error ? err.message : 'Unknown error'
