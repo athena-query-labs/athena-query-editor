@@ -55,25 +55,25 @@ export const QueryEditor = ({ height, theme, enableCatalogSearchColumns }: IQuer
         setCurrentQuery((prev) => ({ ...prev, ...updates }))
     }
 
-    const setQueryContent = (query: string, catalog?: string, schema?: string) => {
+    const setQueryContent = (query: string, catalog?: string | null, schema?: string | null) => {
         const updates: Partial<QueryInfo> = {}
 
         if (query) {
             updates.query = query
         }
 
-        if (catalog) {
-            updates.catalog = catalog
+        if (catalog !== undefined) {
+            updates.catalog = catalog ?? undefined
         }
 
-        if (schema) {
-            updates.schema = schema
+        if (schema !== undefined) {
+            updates.schema = schema ?? undefined
         }
 
         applyQueryUpdates(updates)
     }
 
-    const appendQueryContent = (query: string, catalog?: string, schema?: string) => {
+    const appendQueryContent = (query: string, catalog?: string | null, schema?: string | null) => {
         const activeQuery = queries.getCurrentQuery()
         const updates: Partial<QueryInfo> = {}
 
@@ -84,11 +84,11 @@ export const QueryEditor = ({ height, theme, enableCatalogSearchColumns }: IQuer
         }
 
         if (catalog !== undefined) {
-            updates.catalog = catalog
+            updates.catalog = catalog ?? undefined
         }
 
         if (schema !== undefined) {
-            updates.schema = schema
+            updates.schema = schema ?? undefined
         }
 
         applyQueryUpdates(updates)
