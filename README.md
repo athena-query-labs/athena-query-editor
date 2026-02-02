@@ -59,6 +59,10 @@ Implementation details:
 * Uses Node.js v24+
 * Monaco editor + ANTLR parser using the Trino language
 
+## Architecture Decision Records (ADR)
+
+ADR stands for Architecture Decision Record. See the index in `docs/adr/README.md`.
+
 ## Features
 
 * Browse metadata about catalogs, schemas, tables, and more
