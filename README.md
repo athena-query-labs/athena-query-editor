@@ -182,6 +182,14 @@ Add `/query/` path. Note any path can be used:
 
 ## Development
 
+### Git hooks (recommended)
+
+Enable local hooks to run type checks and linting on commit:
+
+```shell
+git config core.hooksPath .githooks
+```
+
 ### Build and run
 
 1. Install Node.js (v20 or newer) from <https://nodejs.org/en/download/>

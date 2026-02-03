@@ -25,7 +25,9 @@ export function createMetadataRouter(config: AppConfig, athena: AthenaClient) {
           })
         )
         databases.push(
-          ...(result.DatabaseList ?? []).map((db) => db.Name).filter(Boolean)
+          ...(result.DatabaseList ?? [])
+            .map((db) => db.Name)
+            .filter((name): name is string => Boolean(name))
         )
         nextToken = result.NextToken
       } while (nextToken)
