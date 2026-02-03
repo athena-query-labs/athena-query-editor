@@ -19,3 +19,5 @@
 - **Context compaction:** Before any context compression/summarization, commit all intended changes so nothing gets lost.
 - **Drawer layout:** Use grid columns for sidebar/main; keep Drawer `position: static` so it participates in layout. Avoid absolute/fixed Drawer, which can cause width/cropping issues.
 - **Header isolation:** The title/theme toggle lives in `precise/src/main.tsx` header row and should remain outside QueryEditor layout to avoid being affected by sidebar collapse/expand.
+- **Query history table:** If `query_history` is missing, migrations must be applied before use (manual process in this repo).
+- **Database list truncation:** Athena `ListDatabases` is paginated; missing databases indicate `NextToken` wasn’t followed. Fix by looping through pages and aggregating results.
