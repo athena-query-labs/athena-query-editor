@@ -17,34 +17,6 @@ export default defineConfig({
       },
     },
   },
-  build: {
-    lib: {
-      entry: "src/index.ts",
-      name: "QueryEditor",
-      fileName: "index"
-    },
-    rollupOptions: {
-      // Don’t bundle peer dependencies like React
-      external: [
-        "react",
-        "react-dom",
-        "react-dom/client",
-        "react-dom/server",
-        "react/jsx-runtime",
-        "react/jsx-dev-runtime"
-      ],
-      output: {
-        globals: {
-          react: "React",
-          "react-dom": "ReactDOM",
-          "react-dom/client": "ReactDOMClient",
-          "react-dom/server": "ReactDOMServer",
-          "react/jsx-runtime": "jsxRuntime",
-          "react/jsx-dev-runtime": "jsxDevRuntime"
-        }
-      }
-    }
-  },
 });
 
 // Used for integration into Trino

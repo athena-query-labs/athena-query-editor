@@ -20,9 +20,8 @@ app.use(express.json({ limit: '1mb' }))
 app.use(requireUser)
 
 const staticRoot = path.join(process.cwd(), 'public')
-if (fs.existsSync(staticRoot)) {
-  app.use(express.static(staticRoot))
-}
+const staticIndex = path.join(staticRoot, 'index.html')
+app.use(express.static(staticRoot))
 
 app.get('/health', (_req, res) => {
   res.json({ ok: true })
@@ -32,11 +31,9 @@ app.use('/api/query', createQueryRouter(config, athena, s3, pool))
 app.use('/api/metadata', createMetadataRouter(config, athena))
 app.use('/api/history', createHistoryRouter(pool))
 
-if (fs.existsSync(staticRoot)) {
-  app.get('*', (_req, res) => {
-    res.sendFile(path.join(staticRoot, 'index.html'))
-  })
-}
+app.get('*', (_req, res) => {
+  res.sendFile(staticIndex)
+})
 
 app.use((err: unknown, _req: Request, res: Response, _next: NextFunction) => {
   const message = err instanceof Error ? err.message : 'Unknown error'

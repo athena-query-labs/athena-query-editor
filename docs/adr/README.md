@@ -17,6 +17,7 @@ Backend
 Frontend
 - ADR-0006: Use Vite proxy to inject X-Email in local dev (`0006-vite-proxy-injects-x-email.md`)
 - ADR-0009: Cap UI result rendering at 10,000 rows (`0009-cap-ui-results-at-10000-rows.md`)
+- ADR-0011: Switch frontend build to application output (`0011-switch-frontend-to-app-build.md`)
 
 ## Naming and Format
 
