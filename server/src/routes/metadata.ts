@@ -15,12 +15,20 @@ export function createMetadataRouter(config: AppConfig, athena: AthenaClient) {
 
   router.get('/databases', async (_req, res, next) => {
     try {
-      const result = await athena.send(
-        new ListDatabasesCommand({
-          CatalogName: config.defaultCatalog,
-        })
-      )
-      const databases = (result.DatabaseList ?? []).map((db) => db.Name).filter(Boolean)
+      const databases: string[] = []
+      let nextToken: string | undefined
+      do {
+        const result = await athena.send(
+          new ListDatabasesCommand({
+            CatalogName: config.defaultCatalog,
+            NextToken: nextToken,
+          })
+        )
+        databases.push(
+          ...(result.DatabaseList ?? []).map((db) => db.Name).filter(Boolean)
+        )
+        nextToken = result.NextToken
+      } while (nextToken)
       res.json({ databases })
     } catch (err) {
       next(err)
