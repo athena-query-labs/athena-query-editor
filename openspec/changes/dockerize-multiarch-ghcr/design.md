@@ -21,8 +21,9 @@
 - **Single-container deployment**: Bundle frontend static assets and backend server into one image to simplify k8s deployment (fewer services). Alternative: multi-container pod (rejected for higher operational complexity).
 - **Multi-stage Docker build**: Use a build stage to compile frontend and backend, then copy artifacts into a slim runtime stage. Alternative: single-stage build (rejected for larger images).
 - **Serve frontend from backend**: Backend will serve built frontend assets (existing pattern in repo), avoiding a separate web server. Alternative: add nginx (rejected for extra config and maintenance).
+- **App-first frontend build**: Switch `precise` from Vite library build to standard app build so `index.html` is produced for container runtime. Alternative: maintain dual build configs (rejected for unnecessary complexity).
 - **GH Actions workflow**: Use separate jobs for amd64 and arm64 builds, then create a multi-arch manifest pointing to both. Native ARM build uses GitHub-hosted `ubuntu-24.04-arm` runners (required). Alternative: QEMU (rejected by requirement).
-- **Tag strategy**: Publish `latest`, and `sha-<short>` or `<git-sha>` tags on pushes; optionally `vX.Y.Z` on releases. Keep consistent for both architectures. Alternative: branch-only tags (rejected for weaker traceability).
+- **Tag strategy**: Publish `latest` on main pushes and `vX.Y.Z` on releases. Alternative: branch-only tags (rejected for weaker traceability).
 
 ## Risks / Trade-offs
 - **[Risk] Native ARM runner availability** → Mitigation: document required runner selection and provide fallback instructions.

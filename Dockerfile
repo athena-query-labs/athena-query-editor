@@ -6,6 +6,7 @@ COPY precise/package.json precise/package-lock.json ./precise/
 RUN cd precise && npm ci
 COPY precise/ ./precise/
 RUN cd precise && npm run build
+RUN test -f /app/precise/dist/index.html
 
 COPY server/package.json server/package-lock.json ./server/
 RUN cd server && npm ci
