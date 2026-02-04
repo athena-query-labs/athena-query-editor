@@ -1,23 +1,37 @@
-## Lessons Learned / Execution Notes
+# Repository Guidelines
 
-- **Repo structure:** This repo is frontend-only by default (`precise/`). Backend must be added under `server/` for Athena integration.
-- **Auth model:** Backend expects `X-Email` from oauth2-proxy. Requests without it must be rejected (401). Use Vite proxy to inject `X-Email` during local dev.
-- **AWS credentials:** Default credential chain may not be the intended profile. Use `.env` with `AWS_PROFILE=<your-profile>` to avoid accidental assumed-role permissions.
-- **Athena metadata API limit:** `ListTableMetadata` enforces `MaxResults <= 50`. Larger values cause validation errors.
-- **S3 output handling:** Athena output location may be bucket or prefix; download helper must normalize to `<prefix>/<queryId>.csv`.
-- **Polling & timeout:** Poll every 1s, timeout at 24h, cancel on timeout, return `TIMEOUT` state to UI.
-- **Metrics formatting:** UI expects queue/exec time in seconds with 2 decimals; scanned size in GB with 2 decimals; cost estimated by region pricing config.
-- **Downloads:** Always attempt presigned URL; if no result file exists return “no download available.” Mark partial downloads when FAILED/CANCELLED.
-- **Postgres migration:** `query_history` must be created before server use; store by `user_email` + `query_execution_id`.
-- **Dev flow:** Build server after route changes (dist used in smoke tests). Use `server/.env` and `server/.gitignore` to avoid committing env.
-- **Local auth in dev:** When hitting APIs manually, remember to include `X-Email` header or requests will 401.
-- **Vite proxy:** Update Vite proxy from `/v1` (Trino) to `/api` (Athena backend) or the UI will keep calling the old Trino endpoints.
-- **Dist vs source:** If using `node dist/index.js` for smoke tests, rebuild after source changes or you’ll hit stale behavior.
-- **Permission debugging:** `aws sts get-caller-identity` is the quickest way to confirm which profile/role is actually being used.
-- **Git staging:** In this environment, `git add` may require escalated permissions due to index lock; rerun with elevated sandbox if needed.
-- **Signed commits:** All commits must use `git commit -s -S`. This is mandatory for every commit.
-- **Context compaction:** Before any context compression/summarization, commit all intended changes so nothing gets lost.
-- **Drawer layout:** Use grid columns for sidebar/main; keep Drawer `position: static` so it participates in layout. Avoid absolute/fixed Drawer, which can cause width/cropping issues.
-- **Header isolation:** The title/theme toggle lives in `precise/src/main.tsx` header row and should remain outside QueryEditor layout to avoid being affected by sidebar collapse/expand.
-- **Query history table:** If `query_history` is missing, migrations must be applied before use (manual process in this repo).
-- **Database list truncation:** Athena `ListDatabases` is paginated; missing databases indicate `NextToken` wasn’t followed. Fix by looping through pages and aggregating results.
+## Project Structure & Module Organization
+- `precise/`: React + Vite frontend (TypeScript) with `src/` and `public/`.
+- `server/`: Express + TypeScript Athena backend with `src/`, `migrations/`, `config/`, and `scripts/`.
+- `docs/adr/`: Architecture Decision Records.
+- `openspec/`: OpenSpec change artifacts.
+- `dist/`: build outputs; rebuild after source changes, especially before smoke tests or `node dist/index.js`.
+
+## Build, Test, and Development Commands
+- Frontend (`precise/`): `npm run dev` (Vite), `npm run build` (build `dist/`), `npm run check` (lint/format), `npm run antlr4ng` (regen parser).
+- Backend (`server/`): `npm run dev` (tsx watch), `npm run build` (compile), `npm run start` (run `dist/index.js`), `npm run test:smoke` / `npm run test:query` (integration scripts; server running).
+- Type checks: `npm run typecheck` in both packages.
+
+## Coding Style & Naming Conventions
+- TypeScript throughout; follow existing patterns in `src/`.
+- Use 2-space indentation and standard TS/React naming (PascalCase components, camelCase variables).
+- Frontend uses ESLint and Prettier; prefer running `npm run check` before commits.
+
+## Testing Guidelines
+- No unit test framework is configured; validation is via `typecheck` + smoke/query scripts.
+- Smoke tests expect `SMOKE_BASE_URL` and `SMOKE_USER_EMAIL`.
+
+## Commit & Pull Request Guidelines
+- Recent commits use short, imperative subjects; some use conventional prefixes like `chore:` or `docs:`. Follow that style.
+- Commits must be signed and include a signed-off-by: use `git commit -s -S`.
+- PRs should include a clear summary, testing notes, and screenshots or GIFs for UI changes.
+
+## Athena Backend & UI Notes
+- Auth: every API call must include `X-Email`. In dev, set `VITE_DEV_USER_EMAIL` and ensure the Vite proxy targets `/api` (not `/v1`).
+- AWS creds: set `AWS_PROFILE` in `.env` and verify with `aws sts get-caller-identity`. Required env: `AWS_REGION`, `ATHENA_WORKGROUP`, `ATHENA_OUTPUT_LOCATION`.
+- Metadata APIs: `ListTableMetadata` enforces `MaxResults <= 50`; `ListDatabases` is paginated via `NextToken`.
+- Query lifecycle: poll every 1s, timeout at 24h, cancel on timeout, and return `TIMEOUT` to the UI.
+- Results: normalize output to `<prefix>/<queryId>.csv`; always try presigned URLs; return “no download available” if missing; mark partial downloads for FAILED/CANCELLED.
+- Metrics: queue/exec seconds with 2 decimals, scanned size in GB with 2 decimals, cost from pricing config.
+- Storage: run migrations to create `query_history` before server use; store by `user_email` + `query_execution_id`.
+- Layout: keep Drawer `position: static` in a grid; keep the title/theme toggle in `precise/src/main.tsx` header outside `QueryEditor`.
