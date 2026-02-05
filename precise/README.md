@@ -1,15 +1,13 @@
-# Trino Query UI
+# Athena Query Editor UI
 
-A reusable React component as a query interface for the SQL query engine
-[Trino](https://trino.io/). Browse connected catalogs, write SQL queries,
-execute the queries and inspect result data all in a web application connected
-to your Trino cluster.
+A reusable React component as a query interface for AWS Athena. Browse connected
+catalogs, write SQL queries, execute them, and inspect result data in a web app
+backed by the Athena API.
 
 The component can be embedded into any React application and configured to proxy
-requests to a local or remote Trino cluster.
+requests to a local or remote Athena backend.
 
-Find more details including using the component, screenshots, development and
-more in our [source code repository](https://github.com/simpligility/trino-query-ui).
+See the root `README.md` for setup, backend configuration, and Docker usage.
 
 ## UI Layout Structure (Frontend)
 
@@ -17,7 +15,7 @@ Top-level layout and nesting (from outer to inner):
 
 1) `precise/src/main.tsx`
    - **Root App container**: a grid with rows `auto 1fr auto`
-   - **Header row**: title (`Athena query editor - Example app`) + theme toggle
+   - **Header row**: title (`Athena Query Editor - Example app`) + theme toggle
    - **Editor row**: `QueryEditor` mounted inside a `div` that measures height
 
 2) `precise/src/QueryEditor.tsx`

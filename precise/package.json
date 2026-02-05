@@ -1,24 +1,24 @@
 {
-  "name": "trino-query-ui",
-  "description": "Trino Query Editor react component",
+  "name": "athena-query-editor",
+  "description": "Athena Query Editor React component",
   "version": "0.1.2",
   "author": {
-    "name": "Trino contributors",
-    "email": "general@trino.io",
-    "url": "https://github.com/trinodb/trino-query-ui/graphs/contributors"
+    "name": "Athena Query Editor contributors",
+    "url": "https://github.com/athena-query-labs/athena-query-editor/graphs/contributors"
   },
   "keywords": [
-    "trino",
-    "trinodb",
+    "athena",
+    "aws",
+    "sql",
     "react"
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/trinodb/trino-query-ui.git"
+    "url": "https://github.com/athena-query-labs/athena-query-editor.git"
   },
-  "homepage": "https://github.com/trinodb/trino-query-ui",
+  "homepage": "https://github.com/athena-query-labs/athena-query-editor",
   "bugs": {
-    "url": "https://github.com/trinodb/trino-query-ui/issues"
+    "url": "https://github.com/athena-query-labs/athena-query-editor/issues"
   },
   "main": "dist/index.js",
   "license": "Apache-2.0",
