@@ -28,7 +28,7 @@
 
 ## Athena Backend & UI Notes
 - Auth: every API call must include `X-Email`. In dev, set `VITE_DEV_USER_EMAIL` and ensure the Vite proxy targets `/api` (not `/v1`).
-- AWS creds: set `AWS_PROFILE` in `.env` and verify with `aws sts get-caller-identity`. Required env: `AWS_REGION`, `ATHENA_WORKGROUP`, `ATHENA_OUTPUT_LOCATION`.
+- AWS credentials: set `AWS_PROFILE` in `.env` and verify with `aws sts get-caller-identity`. Required env: `AWS_REGION`, `ATHENA_WORKGROUP`, `ATHENA_OUTPUT_LOCATION`.
 - Metadata APIs: `ListTableMetadata` enforces `MaxResults <= 50`; `ListDatabases` is paginated via `NextToken`.
 - Query lifecycle: poll every 1s, timeout at 24h, cancel on timeout, and return `TIMEOUT` to the UI.
 - Results: normalize output to `<prefix>/<queryId>.csv`; always try presigned URLs; return “no download available” if missing; mark partial downloads for FAILED/CANCELLED.
