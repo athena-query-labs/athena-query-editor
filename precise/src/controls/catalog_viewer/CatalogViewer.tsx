@@ -402,6 +402,7 @@ const CatalogViewer: React.FC<CatalogViewerProps> = ({
                                                         schema={schema}
                                                         filterText={filterText}
                                                         isVisible={isVisible}
+                                                        isExpanded={isExpanded}
                                                         isLoading={isLoading}
                                                         hasMatchingChildren={hasMatchingChildren}
                                                         isActive={
@@ -412,6 +413,7 @@ const CatalogViewer: React.FC<CatalogViewerProps> = ({
                                                         schemaError={SchemaProvider.schemaErrors.get(schemaKey)}
                                                         isSchemaLoaded={SchemaProvider.loadedSchemas.has(schemaKey)}
                                                         onGenerateQuery={handleGenerateQuery}
+                                                        onSchemaExpand={(path) => handleToggle(path, true)}
                                                     />
                                                 )
                                             })}

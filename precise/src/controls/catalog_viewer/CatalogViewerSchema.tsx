@@ -14,6 +14,7 @@ interface SchemaProps {
     schema: Schema
     filterText: string
     isVisible: (path: string) => boolean
+    isExpanded: (path: string) => boolean
     isLoading: boolean
     hasMatchingChildren: (path: string) => boolean
     isActive: boolean
@@ -26,6 +27,7 @@ interface SchemaProps {
         catalogName?: string,
         schemaName?: string
     ) => void
+    onSchemaExpand?: (path: string) => void
 }
 
 const CatalogViewerSchema: React.FC<SchemaProps> = ({
@@ -33,6 +35,7 @@ const CatalogViewerSchema: React.FC<SchemaProps> = ({
     schema,
     filterText,
     isVisible,
+    isExpanded,
     isLoading,
     hasMatchingChildren,
     isActive,
@@ -40,6 +43,7 @@ const CatalogViewerSchema: React.FC<SchemaProps> = ({
     schemaError,
     isSchemaLoaded,
     onGenerateQuery,
+    onSchemaExpand,
 }) => {
     const schemaPath = buildPath.schema(catalogName, schema.getName())
 
@@ -53,6 +57,7 @@ const CatalogViewerSchema: React.FC<SchemaProps> = ({
         if (onGenerateQuery) {
             onGenerateQuery('SET_SCHEMA', null, catalogName, schema.getName())
         }
+        onSchemaExpand?.(schemaPath)
     }
 
     const tables = Array.from(schema.getTables().values()).sort((a: Table, b: Table) =>
@@ -142,7 +147,7 @@ const CatalogViewerSchema: React.FC<SchemaProps> = ({
                             tableRef={new TableReference(catalogName, schema.getName(), table.getName())}
                             tableType={table.getType()}
                             filterText={filterText}
-                            isExpanded={isVisible(tablePath)}
+                            isExpanded={isExpanded(tablePath)}
                             isVisible={isVisible}
                             isLoading={isLoading}
                             hasMatchingChildren={hasMatchingChildren}
