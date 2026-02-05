@@ -139,7 +139,18 @@ class SchemaProvider {
                 throw new Error(await tablesResponse.text())
             }
             const tablesData = await tablesResponse.json()
-            const tables = tablesData.tables ?? []
+            type TableEntry = { name: string; type?: string }
+            const tables: TableEntry[] = (tablesData.tables ?? [])
+                .map((table: { name?: string; type?: string; tableType?: string } | string): TableEntry => {
+                    if (typeof table === 'string') {
+                        return { name: table, type: undefined }
+                    }
+                    return {
+                        name: table?.name ?? '',
+                        type: table?.type ?? table?.tableType ?? undefined,
+                    }
+                })
+                .filter((table: TableEntry) => table.name)
 
             const catalog = this.catalogs.get(catalogName)
             if (!catalog) {
@@ -147,11 +158,16 @@ class SchemaProvider {
             }
             const schema = catalog.getOrAdd(new Schema(databaseName))
 
-            for (const tableName of tables) {
-                if (!schema.getTables().has(tableName)) {
-                    const table = new Table(tableName)
+            for (const tableEntry of tables) {
+                const tableName = tableEntry.name
+                const tableType = tableEntry.type
+                const existingTable = schema.getTables().get(tableName)
+                if (!existingTable) {
+                    const table = new Table(tableName, tableType)
                     schema.addTable(table)
                     this.tables.set(`${catalogName}.${databaseName}.${tableName}`, table)
+                } else if (tableType && !existingTable.getType()) {
+                    existingTable.setType(tableType)
                 }
             }
             this.loadedSchemas.add(key)
@@ -178,7 +194,9 @@ class SchemaProvider {
                 throw new Error(await response.text())
             }
             const data = await response.json()
-            const table = new Table(tableRef.tableName)
+            const existingTable = this.tables.get(tableRef.fullyQualified)
+            const tableType = data.tableType ?? existingTable?.getType()
+            const table = new Table(tableRef.tableName, tableType)
             for (const col of data.columns ?? []) {
                 table.getColumns().push(new Column(col.name, col.type, col.comment || '', ''))
             }
@@ -197,7 +215,8 @@ class SchemaProvider {
     }
 
     private static fallbackToDescribe(tableRef: TableReference, callback: (table: Table) => void) {
-        const table = new Table(tableRef.tableName)
+        const existingTable = this.tables.get(tableRef.fullyQualified)
+        const table = new Table(tableRef.tableName, existingTable?.getType())
         table.setError('Failed to load columns')
         callback(table)
     }
