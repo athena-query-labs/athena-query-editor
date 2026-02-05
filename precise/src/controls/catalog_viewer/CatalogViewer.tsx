@@ -17,7 +17,7 @@ import {
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft'
 import ChevronRightIcon from '@mui/icons-material/ChevronRight'
 import RefreshIcon from '@mui/icons-material/Refresh'
-import StorageOutlinedIcon from '@mui/icons-material/StorageOutlined'
+import DnsOutlinedIcon from '@mui/icons-material/DnsOutlined'
 import { SimpleTreeView, TreeItem } from '@mui/x-tree-view'
 import CatalogViewerSchema from './CatalogViewerSchema'
 import SchemaProvider from './../../sql/SchemaProvider'
@@ -352,7 +352,7 @@ const CatalogViewer: React.FC<CatalogViewerProps> = ({
                                     key={catalogPath}
                                     itemId={catalogPath}
                                     slots={{
-                                        icon: StorageOutlinedIcon,
+                                        icon: DnsOutlinedIcon,
                                     }}
                                     label={
                                         <Box style={{ display: 'flex', alignItems: 'center', gap: 8 }}>

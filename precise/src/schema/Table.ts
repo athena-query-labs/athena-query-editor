@@ -2,12 +2,14 @@ import Column from './Column'
 
 class Table {
     private name: string
+    private tableType?: string
     private columns: Column[] = []
     private error: string = ''
     private isLoadingColumns: boolean = false
 
-    constructor(name: string) {
+    constructor(name: string, tableType?: string) {
         this.name = name
+        this.tableType = tableType
     }
 
     getName() {
@@ -16,6 +18,18 @@ class Table {
 
     getColumns() {
         return this.columns
+    }
+
+    getType() {
+        return this.tableType
+    }
+
+    setType(tableType?: string) {
+        this.tableType = tableType
+    }
+
+    isView() {
+        return Boolean(this.tableType && this.tableType.toUpperCase().includes('VIEW'))
     }
 
     getError() {

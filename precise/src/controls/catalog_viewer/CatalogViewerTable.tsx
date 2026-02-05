@@ -3,7 +3,8 @@ import { Alert, Box, IconButton, Typography } from '@mui/material'
 import { TreeItem } from '@mui/x-tree-view'
 import HourglassEmptyOutlinedIcon from '@mui/icons-material/HourglassEmptyOutlined'
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined'
-import TableRowsOutlined from '@mui/icons-material/TableRowsOutlined'
+import TableChartOutlinedIcon from '@mui/icons-material/TableChartOutlined'
+import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined'
 import Table from '../../schema/Table'
 import SchemaProvider from '../../sql/SchemaProvider'
 import TableReference from '../../schema/TableReference'
@@ -12,6 +13,7 @@ import { buildPath } from './ViewerState'
 
 interface CatalogViewerTableProps {
     tableRef: TableReference
+    tableType?: string
     filterText: string
     isExpanded: boolean
     isVisible: (path: string) => boolean
@@ -22,6 +24,7 @@ interface CatalogViewerTableProps {
 
 const CatalogViewerTable: React.FC<CatalogViewerTableProps> = ({
     tableRef,
+    tableType,
     filterText,
     isExpanded,
     isVisible,
@@ -49,6 +52,9 @@ const CatalogViewerTable: React.FC<CatalogViewerTableProps> = ({
         return null
     }
 
+    const resolvedTableType = table.getType() ?? tableType
+    const isView = Boolean(resolvedTableType && resolvedTableType.toUpperCase().includes('VIEW'))
+
     const handleGenerateQuery = (e: React.MouseEvent) => {
         e.stopPropagation() // Prevent toggling expansion
         if (onGenerateQuery) {
@@ -61,7 +67,11 @@ const CatalogViewerTable: React.FC<CatalogViewerTableProps> = ({
             key={tablePath}
             itemId={tablePath}
             slots={{
-                icon: !table.isLoading() ? TableRowsOutlined : HourglassEmptyOutlinedIcon,
+                icon: table.isLoading()
+                    ? HourglassEmptyOutlinedIcon
+                    : isView
+                      ? VisibilityOutlinedIcon
+                      : TableChartOutlinedIcon,
             }}
             label={
                 <Box

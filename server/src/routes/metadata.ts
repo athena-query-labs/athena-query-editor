@@ -44,14 +44,28 @@ export function createMetadataRouter(config: AppConfig, athena: AthenaClient) {
         res.status(400).json({ error: 'database is required' })
         return
       }
-      const result = await athena.send(
-        new ListTableMetadataCommand({
-          CatalogName: config.defaultCatalog,
-          DatabaseName: database,
-          MaxResults: 50,
-        })
-      )
-      const tables = (result.TableMetadataList ?? []).map((tbl) => tbl.Name).filter(Boolean)
+      const tables: { name: string; type: string }[] = []
+      let nextToken: string | undefined
+      do {
+        const result = await athena.send(
+          new ListTableMetadataCommand({
+            CatalogName: config.defaultCatalog,
+            DatabaseName: database,
+            MaxResults: 50,
+            NextToken: nextToken,
+            WorkGroup: config.workgroup,
+          })
+        )
+        tables.push(
+          ...(result.TableMetadataList ?? [])
+            .map((tbl) => ({
+              name: tbl.Name ?? '',
+              type: tbl.TableType ?? '',
+            }))
+            .filter((tbl) => Boolean(tbl.name))
+        )
+        nextToken = result.NextToken
+      } while (nextToken)
       res.json({ tables })
     } catch (err) {
       next(err)
@@ -78,7 +92,7 @@ export function createMetadataRouter(config: AppConfig, athena: AthenaClient) {
         type: col.Type ?? '',
         comment: col.Comment ?? '',
       }))
-      res.json({ columns })
+      res.json({ columns, tableType: result.TableMetadata?.TableType ?? '' })
     } catch (err) {
       next(err)
     }
