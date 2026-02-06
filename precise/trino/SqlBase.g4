@@ -74,6 +74,8 @@ statement
     | ALTER TABLE (IF EXISTS)? tableName=qualifiedName
         ADD COLUMN (IF NOT EXISTS)? column=columnDefinition            #addColumn
     | ALTER TABLE (IF EXISTS)? tableName=qualifiedName
+        ADD (IF NOT EXISTS)? partitionDefinition+                      #addPartition
+    | ALTER TABLE (IF EXISTS)? tableName=qualifiedName
         RENAME COLUMN (IF EXISTS)? from=qualifiedName TO to=identifier #renameColumn
     | ALTER TABLE (IF EXISTS)? tableName=qualifiedName
         DROP COLUMN (IF EXISTS)? column=qualifiedName                  #dropColumn
@@ -87,6 +89,7 @@ statement
         ('(' (callArgument (',' callArgument)*)? ')')?
         (WHERE where=booleanExpression)?                               #tableExecute
     | ANALYZE qualifiedName (WITH properties)?                         #analyze
+    | UNLOAD '(' query ')' TO string (WITH properties)?                #unload
     | CREATE (OR REPLACE)? MATERIALIZED VIEW
         (IF NOT EXISTS)? qualifiedName
         (GRACE PERIOD interval)?
@@ -152,6 +155,7 @@ statement
         (LIKE pattern=string (ESCAPE escape=string)?)?                 #showCatalogs
     | SHOW COLUMNS (FROM | IN) qualifiedName?
         (LIKE pattern=string (ESCAPE escape=string)?)?                 #showColumns
+    | SHOW PARTITIONS qualifiedName                                    #showPartitions
     | SHOW STATS FOR qualifiedName                                     #showStats
     | SHOW STATS FOR '(' query ')'                                     #showStatsForQuery
     | SHOW CURRENT? ROLES ((FROM | IN) identifier)?                    #showRoles
@@ -220,6 +224,18 @@ property
 propertyValue
     : DEFAULT       #defaultPropertyValue
     | expression    #nonDefaultPropertyValue
+    ;
+
+partitionSpec
+    : '(' partitionAssignment (',' partitionAssignment)* ')'
+    ;
+
+partitionAssignment
+    : identifier EQ expression
+    ;
+
+partitionDefinition
+    : PARTITION partitionSpec (LOCATION string)?
     ;
 
 queryNoWith
@@ -902,7 +918,7 @@ nonReserved
     | IF | IGNORE | IMMEDIATE | INCLUDING | INITIAL | INPUT | INTERVAL | INVOKER | IO | ISOLATION
     | JSON
     | KEEP | KEY | KEYS
-    | LAST | LATERAL | LEADING | LEVEL | LIMIT | LOCAL | LOGICAL
+    | LAST | LATERAL | LEADING | LEVEL | LIMIT | LOCAL | LOCATION | LOGICAL
     | MAP | MATCH | MATCHED | MATCHES | MATCH_RECOGNIZE | MATERIALIZED | MEASURES | MERGE | MINUTE | MONTH
     | NESTED | NEXT | NFC | NFD | NFKC | NFKD | NO | NONE | NULLIF | NULLS
     | OBJECT | OF | OFFSET | OMIT | ONE | ONLY | OPTION | ORDINALITY | OUTPUT | OVER | OVERFLOW
@@ -912,7 +928,7 @@ nonReserved
     | SCALAR | SCHEMA | SCHEMAS | SECOND | SECURITY | SEEK | SERIALIZABLE | SESSION | SET | SETS
     | SHOW | SOME | START | STATS | SUBSET | SUBSTRING | SYSTEM
     | TABLES | TABLESAMPLE | TEXT | TEXT_STRING | TIES | TIME | TIMESTAMP | TO | TRAILING | TRANSACTION | TRUNCATE | TRY_CAST | TYPE
-    | UNBOUNDED | UNCOMMITTED | UNCONDITIONAL | UNIQUE | UNKNOWN | UNMATCHED | UPDATE | USE | USER | UTF16 | UTF32 | UTF8
+    | UNBOUNDED | UNCOMMITTED | UNCONDITIONAL | UNLOAD | UNIQUE | UNKNOWN | UNMATCHED | UPDATE | USE | USER | UTF16 | UTF32 | UTF8
     | VALIDATE | VALUE | VERBOSE | VERSION | VIEW
     | WINDOW | WITHIN | WITHOUT | WORK | WRAPPER | WRITE
     | YEAR
@@ -1051,6 +1067,7 @@ LISTAGG: 'LISTAGG';
 LOCAL: 'LOCAL';
 LOCALTIME: 'LOCALTIME';
 LOCALTIMESTAMP: 'LOCALTIMESTAMP';
+LOCATION: 'LOCATION';
 LOGICAL: 'LOGICAL';
 MAP: 'MAP';
 MATCH: 'MATCH';
@@ -1168,6 +1185,7 @@ UESCAPE: 'UESCAPE';
 UNBOUNDED: 'UNBOUNDED';
 UNCOMMITTED: 'UNCOMMITTED';
 UNCONDITIONAL: 'UNCONDITIONAL';
+UNLOAD: 'UNLOAD';
 UNION: 'UNION';
 UNIQUE: 'UNIQUE';
 UNKNOWN: 'UNKNOWN';

@@ -27,6 +27,7 @@ import { CommentViewContext } from "./SqlBaseParser.js";
 import { CommentColumnContext } from "./SqlBaseParser.js";
 import { RenameTableContext } from "./SqlBaseParser.js";
 import { AddColumnContext } from "./SqlBaseParser.js";
+import { AddPartitionContext } from "./SqlBaseParser.js";
 import { RenameColumnContext } from "./SqlBaseParser.js";
 import { DropColumnContext } from "./SqlBaseParser.js";
 import { SetColumnTypeContext } from "./SqlBaseParser.js";
@@ -34,6 +35,7 @@ import { SetTableAuthorizationContext } from "./SqlBaseParser.js";
 import { SetTablePropertiesContext } from "./SqlBaseParser.js";
 import { TableExecuteContext } from "./SqlBaseParser.js";
 import { AnalyzeContext } from "./SqlBaseParser.js";
+import { UnloadContext } from "./SqlBaseParser.js";
 import { CreateMaterializedViewContext } from "./SqlBaseParser.js";
 import { CreateViewContext } from "./SqlBaseParser.js";
 import { RefreshMaterializedViewContext } from "./SqlBaseParser.js";
@@ -63,6 +65,7 @@ import { ShowTablesContext } from "./SqlBaseParser.js";
 import { ShowSchemasContext } from "./SqlBaseParser.js";
 import { ShowCatalogsContext } from "./SqlBaseParser.js";
 import { ShowColumnsContext } from "./SqlBaseParser.js";
+import { ShowPartitionsContext } from "./SqlBaseParser.js";
 import { ShowStatsContext } from "./SqlBaseParser.js";
 import { ShowStatsForQueryContext } from "./SqlBaseParser.js";
 import { ShowRolesContext } from "./SqlBaseParser.js";
@@ -96,6 +99,9 @@ import { PropertyAssignmentsContext } from "./SqlBaseParser.js";
 import { PropertyContext } from "./SqlBaseParser.js";
 import { DefaultPropertyValueContext } from "./SqlBaseParser.js";
 import { NonDefaultPropertyValueContext } from "./SqlBaseParser.js";
+import { PartitionSpecContext } from "./SqlBaseParser.js";
+import { PartitionAssignmentContext } from "./SqlBaseParser.js";
+import { PartitionDefinitionContext } from "./SqlBaseParser.js";
 import { QueryNoWithContext } from "./SqlBaseParser.js";
 import { LimitRowCountContext } from "./SqlBaseParser.js";
 import { RowCountContext } from "./SqlBaseParser.js";
@@ -597,6 +603,18 @@ export class SqlBaseListener implements ParseTreeListener {
      */
     exitAddColumn?: (ctx: AddColumnContext) => void;
     /**
+     * Enter a parse tree produced by the `addPartition`
+     * labeled alternative in `SqlBaseParser.statement`.
+     * @param ctx the parse tree
+     */
+    enterAddPartition?: (ctx: AddPartitionContext) => void;
+    /**
+     * Exit a parse tree produced by the `addPartition`
+     * labeled alternative in `SqlBaseParser.statement`.
+     * @param ctx the parse tree
+     */
+    exitAddPartition?: (ctx: AddPartitionContext) => void;
+    /**
      * Enter a parse tree produced by the `renameColumn`
      * labeled alternative in `SqlBaseParser.statement`.
      * @param ctx the parse tree
@@ -680,6 +698,18 @@ export class SqlBaseListener implements ParseTreeListener {
      * @param ctx the parse tree
      */
     exitAnalyze?: (ctx: AnalyzeContext) => void;
+    /**
+     * Enter a parse tree produced by the `unload`
+     * labeled alternative in `SqlBaseParser.statement`.
+     * @param ctx the parse tree
+     */
+    enterUnload?: (ctx: UnloadContext) => void;
+    /**
+     * Exit a parse tree produced by the `unload`
+     * labeled alternative in `SqlBaseParser.statement`.
+     * @param ctx the parse tree
+     */
+    exitUnload?: (ctx: UnloadContext) => void;
     /**
      * Enter a parse tree produced by the `createMaterializedView`
      * labeled alternative in `SqlBaseParser.statement`.
@@ -1028,6 +1058,18 @@ export class SqlBaseListener implements ParseTreeListener {
      * @param ctx the parse tree
      */
     exitShowColumns?: (ctx: ShowColumnsContext) => void;
+    /**
+     * Enter a parse tree produced by the `showPartitions`
+     * labeled alternative in `SqlBaseParser.statement`.
+     * @param ctx the parse tree
+     */
+    enterShowPartitions?: (ctx: ShowPartitionsContext) => void;
+    /**
+     * Exit a parse tree produced by the `showPartitions`
+     * labeled alternative in `SqlBaseParser.statement`.
+     * @param ctx the parse tree
+     */
+    exitShowPartitions?: (ctx: ShowPartitionsContext) => void;
     /**
      * Enter a parse tree produced by the `showStats`
      * labeled alternative in `SqlBaseParser.statement`.
@@ -1408,6 +1450,36 @@ export class SqlBaseListener implements ParseTreeListener {
      * @param ctx the parse tree
      */
     exitNonDefaultPropertyValue?: (ctx: NonDefaultPropertyValueContext) => void;
+    /**
+     * Enter a parse tree produced by `SqlBaseParser.partitionSpec`.
+     * @param ctx the parse tree
+     */
+    enterPartitionSpec?: (ctx: PartitionSpecContext) => void;
+    /**
+     * Exit a parse tree produced by `SqlBaseParser.partitionSpec`.
+     * @param ctx the parse tree
+     */
+    exitPartitionSpec?: (ctx: PartitionSpecContext) => void;
+    /**
+     * Enter a parse tree produced by `SqlBaseParser.partitionAssignment`.
+     * @param ctx the parse tree
+     */
+    enterPartitionAssignment?: (ctx: PartitionAssignmentContext) => void;
+    /**
+     * Exit a parse tree produced by `SqlBaseParser.partitionAssignment`.
+     * @param ctx the parse tree
+     */
+    exitPartitionAssignment?: (ctx: PartitionAssignmentContext) => void;
+    /**
+     * Enter a parse tree produced by `SqlBaseParser.partitionDefinition`.
+     * @param ctx the parse tree
+     */
+    enterPartitionDefinition?: (ctx: PartitionDefinitionContext) => void;
+    /**
+     * Exit a parse tree produced by `SqlBaseParser.partitionDefinition`.
+     * @param ctx the parse tree
+     */
+    exitPartitionDefinition?: (ctx: PartitionDefinitionContext) => void;
     /**
      * Enter a parse tree produced by `SqlBaseParser.queryNoWith`.
      * @param ctx the parse tree
