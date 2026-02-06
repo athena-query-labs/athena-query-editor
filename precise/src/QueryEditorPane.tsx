@@ -155,7 +155,7 @@ class QueryEditorPane extends React.Component<QueryEditorPaneProps, QueryEditorP
     }
 
     handleTabCreate = () => {
-        const newQuery = this.props.queries.addQuery(false, 'New query')
+        const newQuery = this.props.queries.addQuery(false)
         monaco.editor.createModel('', TRINO_SQL_LANGUAGE, monaco.Uri.parse(`file:///${newQuery.id}`))
         this.props.queries.setCurrentQuery(newQuery.id)
         return newQuery.id
