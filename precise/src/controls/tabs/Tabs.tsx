@@ -45,6 +45,9 @@ abstract class Tabs<T extends TabInfo> {
 
     addTab(front: boolean = false, title: string = 'New Tab'): T {
         const newTab = this.createNewTab()
+        if (title.trim().length > 0) {
+            newTab.title = title
+        }
         this.tabs.push(newTab)
         this.currentTabId = newTab.id
         if (front) {

@@ -4,6 +4,52 @@ import { v4 as uuidv4 } from 'uuid'
 import Tabs from './../controls/tabs/Tabs'
 
 class Queries extends Tabs<QueryInfo> {
+    private static readonly CURRENT_QUERY_TAB_ID_KEY = 'current_query_tab_id'
+
+    constructor() {
+        super()
+
+        const savedQueryId = this.getSavedCurrentQueryId()
+        if (savedQueryId && this.getTabs().some((query) => query.id === savedQueryId)) {
+            super.setCurrentTab(savedQueryId)
+        }
+
+        this.addChangeListener(this.persistCurrentQueryTabId)
+        this.persistCurrentQueryTabId()
+    }
+
+    private getSavedCurrentQueryId(): string | null {
+        return localStorage.getItem(Queries.CURRENT_QUERY_TAB_ID_KEY)
+    }
+
+    private persistCurrentQueryTabId = (): void => {
+        localStorage.setItem(Queries.CURRENT_QUERY_TAB_ID_KEY, this.getCurrentQuery().id)
+    }
+
+    private getNextDefaultQueryTitle(): string {
+        // Reuse the smallest missing positive index so names stay compact: Query 1, Query 2, ...
+        const usedIndices = new Set<number>()
+        for (const query of this.tabs) {
+            // Only count titles that already follow the "Query N" pattern.
+            const match = query.title.match(/^query\s+(\d+)$/i)
+            if (!match) {
+                continue
+            }
+            const parsed = Number.parseInt(match[1], 10)
+            if (Number.isNaN(parsed) || parsed < 1) {
+                continue
+            }
+            usedIndices.add(parsed)
+        }
+
+        let nextIndex = 1
+        while (usedIndices.has(nextIndex)) {
+            nextIndex += 1
+        }
+
+        return `Query ${nextIndex}`
+    }
+
     loadTabs(): QueryInfo[] {
         const queryList: QueryInfo[] = []
         for (let i = 0; i < localStorage.length; i++) {
@@ -59,7 +105,7 @@ class Queries extends Tabs<QueryInfo> {
     }
 
     createNewTab(): QueryInfo {
-        return new QueryInfo('New Query', QueryType.USER_ADDED, '', uuidv4(), false)
+        return new QueryInfo(this.getNextDefaultQueryTitle(), QueryType.USER_ADDED, '', uuidv4(), false)
     }
 
     // Query-specific methods
@@ -68,8 +114,9 @@ class Queries extends Tabs<QueryInfo> {
         return this.getCurrentTab()
     }
 
-    addQuery(front: boolean = false, title: string = 'New Query'): QueryInfo {
-        return this.addTab(front, title)
+    addQuery(front: boolean = false, title?: string): QueryInfo {
+        const resolvedTitle = title && title.trim().length > 0 ? title : this.getNextDefaultQueryTitle()
+        return this.addTab(front, resolvedTitle)
     }
 
     updateQuery(queryId: string, updates: Partial<QueryInfo>): void {
