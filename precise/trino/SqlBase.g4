@@ -16,12 +16,8 @@ grammar SqlBase;
 
 options { caseInsensitive = true; }
 
-tokens {
-    DELIMITER
-}
-
 singleStatement
-    : statement EOF
+    : statement DELIMITER? EOF
     ;
 
 standaloneExpression
@@ -517,7 +513,7 @@ booleanExpression
     ;
 
 // workaround for https://github.com/antlr/antlr4/issues/780
-predicate[ParserRuleContext value]
+predicate[ValueExpressionContext | undefined value]
     : comparisonOperator right=valueExpression                            #comparison
     | comparisonOperator comparisonQuantifier '(' query ')'               #quantifiedComparison
     | NOT? BETWEEN lower=valueExpression AND upper=valueExpression        #between
@@ -1216,6 +1212,7 @@ SLASH: '/';
 PERCENT: '%';
 CONCAT: '||';
 QUESTION_MARK: '?';
+DELIMITER: ';';
 
 STRING
     : '\'' ( ~'\'' | '\'\'' )* '\''

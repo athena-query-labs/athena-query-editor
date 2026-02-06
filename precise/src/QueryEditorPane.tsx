@@ -251,14 +251,7 @@ class QueryEditorPane extends React.Component<QueryEditorPaneProps, QueryEditorP
         }
         const caretPosition: monaco.Position = editor.getPosition()
         const lines: string[] = newValue.split('\n')
-        let parseValue = newValue
-        if (
-            /;\s*$/.test(newValue) &&
-            caretPosition.lineNumber === lines.length &&
-            caretPosition.column >= lines[lines.length - 1].length
-        ) {
-            parseValue = newValue.replace(/;\s*$/, '')
-        }
+        const parseValue = newValue
         const parseLines: string[] = parseValue.split('\n')
 
         // Gather information about the cursor position
