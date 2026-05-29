@@ -67,7 +67,7 @@ The system SHALL load a region-to-price-per-TB mapping from a configuration file
 
 #### Scenario: Missing region price
 - **WHEN** a query runs in a region without a configured price
-- **THEN** the system falls back to a default price and flags the estimate as approximate
+- **THEN** the system falls back silently to the default price (`pricing.defaultPricePerTB`); the response shape is identical to a region-priced estimate
 
 ### Requirement: Optional default catalog and database
 The system SHALL allow configuration of default Athena catalog and database for new sessions.

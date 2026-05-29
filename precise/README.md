@@ -15,12 +15,12 @@ Top-level layout and nesting (from outer to inner):
 
 1) `precise/src/main.tsx`
    - **Root App container**: a grid with rows `auto 1fr auto`
-   - **Header row**: title (`Athena Query Editor - Example app`) + theme toggle
+   - **Header row**: title (`Athena Query Editor`) + theme toggle
    - **Editor row**: `QueryEditor` mounted inside a `div` that measures height
 
 2) `precise/src/QueryEditor.tsx`
    - **Root Box**: `display: grid` with columns `[drawer, main]`
-     - When open: `gridTemplateColumns: "300px 1fr"`
+     - When open: `gridTemplateColumns: "315px 1fr"` (drawer width set by `DRAWER_WIDTH` constant)
      - When collapsed: `gridTemplateColumns: "0px 1fr"`
    - **Left Drawer**: tabs for Catalog/History, uses `position: static` so it participates in grid layout
    - **Main content**: `QueryCell` (right side, always `1fr`)

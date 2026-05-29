@@ -121,7 +121,7 @@ git config core.hooksPath .githooks
 
 ### Build and run
 
-1. Install Node.js (v20 or newer) from <https://nodejs.org/en/download/>
+1. Install Node.js (v24 or newer) from <https://nodejs.org/en/download/>
 2. Start the Athena backend with the required environment variables:
 
 ```shell

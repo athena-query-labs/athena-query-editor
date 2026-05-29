@@ -36,6 +36,6 @@ Negative:
 
 ## Related Implementation and Constraints
 
-- UI result fetching and cap: `precise/src/AsyncAthenaClient.tsx`
-- Result display: `precise/src/ResultSet.tsx`
+- UI result fetching, cap enforcement, and user-facing trim warning: `precise/src/AsyncAthenaClient.tsx` (search for `maxRows`)
+- Result rendering (display only, no cap logic): `precise/src/ResultSet.tsx`
 
