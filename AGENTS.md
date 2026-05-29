@@ -45,7 +45,7 @@ Every API call must carry `X-Email` (ADR-0002). Production: oauth2-proxy injects
 
 - `precise/src/main.tsx` mounts the page header (title + theme toggle) **outside** `QueryEditor`. Keep them separated.
 - `QueryEditor.tsx` Drawer is `position: static` inside a grid layout. Don't switch it to overlay / temporary.
-- `AsyncAthenaClient.tsx` is the active API client; `AsyncTrinoClient.tsx` is a historical sibling kept for parity — don't add new features to it.
+- `AsyncAthenaClient.tsx` is the active API client. (A `AsyncTrinoClient.tsx` sibling existed from the upstream fork and was deleted in 2026-05; do not resurrect — backend speaks Athena, not the Trino REST protocol.)
 - The SQL parser under `precise/src/generated/` is ANTLR-generated from `precise/trino/SqlBase.g4`. Don't hand-edit; rerun `npm run antlr4ng`.
 - Express serves static from `process.cwd()/public`. Local `npm run start` only mirrors the Docker layout after `precise` is built into `server/public` — otherwise just use `npm run dev` for the frontend.
 - Behavior covered by an ADR (auth, polling, row caps, S3 key shape, presigning, pricing format, history key, etc.) — **update or add an ADR in `docs/adr/` and link it from the index whenever you change it.**

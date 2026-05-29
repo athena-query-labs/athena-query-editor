@@ -57,7 +57,7 @@ Implementation details:
 
 * React TypeScript project with Vite
 * Uses Node.js v24+
-* Monaco editor + ANTLR parser using a Trino-compatible SQL grammar (Athena SQL)
+* Monaco editor + ANTLR-based parser tuned for Athena SQL (a Trino/Presto-derived dialect)
 
 ## Architecture Decision Records (ADR)
 
