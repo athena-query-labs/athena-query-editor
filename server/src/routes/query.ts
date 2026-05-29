@@ -203,7 +203,7 @@ export function createQueryRouter(
       }
 
       const filename = `${execution.QueryExecutionId}.csv`
-      const url = await presignGetObject(s3, bucket, key, 60 * 60 * 24, filename)
+      const url = await presignGetObject(s3, bucket, key, 60 * 15, filename)
 
       const state = execution.Status?.State ?? 'UNKNOWN'
       const partial = state === 'FAILED' || state === 'CANCELLED'

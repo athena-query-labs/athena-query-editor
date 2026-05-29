@@ -2,6 +2,7 @@ import 'dotenv/config'
 import fs from 'node:fs'
 import path from 'node:path'
 import express, { Request, Response, NextFunction } from 'express'
+import { ZodError } from 'zod'
 import { loadConfig } from './config.js'
 import { createAthenaClient, createS3Client } from './aws.js'
 import { createPool } from './db.js'
@@ -35,9 +36,35 @@ app.get('*', (_req, res) => {
   res.sendFile(staticIndex)
 })
 
-app.use((err: unknown, _req: Request, res: Response, _next: NextFunction) => {
-  const message = err instanceof Error ? err.message : 'Unknown error'
-  res.status(500).json({ error: message })
+app.use((err: unknown, req: Request, res: Response, _next: NextFunction) => {
+  console.error(`[error] ${req.method} ${req.path}`, err)
+
+  if (err instanceof ZodError) {
+    res.status(400).json({ error: 'Invalid request', issues: err.issues })
+    return
+  }
+
+  const name = err instanceof Error ? err.name : undefined
+  switch (name) {
+    case 'InvalidRequestException':
+      res.status(400).json({ error: err instanceof Error ? err.message : 'Invalid request' })
+      return
+    case 'ResourceNotFoundException':
+      res.status(404).json({ error: 'Resource not found' })
+      return
+    case 'AccessDeniedException':
+      res.status(403).json({ error: 'Access denied (check server IAM permissions)' })
+      return
+    case 'TooManyRequestsException':
+      res.setHeader('Retry-After', '5')
+      res.status(429).json({ error: 'Athena rate limit reached, retry shortly' })
+      return
+    case 'InternalServerException':
+      res.status(502).json({ error: 'Athena service unavailable' })
+      return
+  }
+
+  res.status(500).json({ error: 'Internal error' })
 })
 
 app.listen(config.port, () => {

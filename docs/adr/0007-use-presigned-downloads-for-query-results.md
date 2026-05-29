@@ -9,7 +9,7 @@ Query results can be large and should be downloaded directly from S3. The backen
 
 ## Decision
 
-Provide downloads via presigned S3 URLs. If the result object does not exist, return `available: false`. If a query ended in `FAILED` or `CANCELLED`, return `partial: true` to warn the UI that a partial file may be present.
+Provide downloads via presigned S3 URLs valid for **15 minutes** (matches the AWS SDK default — long enough for a single-click download initiation, short enough to limit blast radius if the URL is leaked via logs, browser history, screenshots, or paste). If the result object does not exist, return `available: false`. If a query ended in `FAILED` or `CANCELLED`, return `partial: true` to warn the UI that a partial file may be present.
 
 ## Key Drivers
 
@@ -34,6 +34,7 @@ Positive:
 
 Negative:
 - Requires S3 permissions for `HeadObject` and `GetObject`.
+- A leaked presigned URL grants anonymous S3 GET for its TTL; mitigated by the short 15-minute window.
 
 ## Related Implementation and Constraints
 
