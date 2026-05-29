@@ -18,15 +18,19 @@ const pool = createPool()
 
 const app = express()
 app.use(express.json({ limit: '1mb' }))
+
+// /health is intentionally unauthenticated so orchestrator probes
+// (Docker HEALTHCHECK / k8s liveness / load balancer pings) can verify
+// the process without injecting X-Email. See ADR-0002 §exception.
+app.get('/health', (_req, res) => {
+  res.json({ ok: true })
+})
+
 app.use(requireUser)
 
 const staticRoot = path.join(process.cwd(), 'public')
 const staticIndex = path.join(staticRoot, 'index.html')
 app.use(express.static(staticRoot))
-
-app.get('/health', (_req, res) => {
-  res.json({ ok: true })
-})
 
 app.use('/api/query', createQueryRouter(config, athena, s3, pool))
 app.use('/api/metadata', createMetadataRouter(config, athena))
@@ -67,6 +71,28 @@ app.use((err: unknown, req: Request, res: Response, _next: NextFunction) => {
   res.status(500).json({ error: 'Internal error' })
 })
 
-app.listen(config.port, () => {
+const server = app.listen(config.port, () => {
   console.log(`Server listening on port ${config.port}`)
 })
+
+// Graceful shutdown on container stop / k8s rollover. Stops accepting
+// new connections, lets in-flight requests finish, then closes the PG
+// pool. The Athena queries themselves live server-side at AWS, so
+// they're unaffected — the frontend can resume polling on reconnect.
+const shutdown = (signal: string) => {
+  console.log(`[shutdown] received ${signal}, draining...`)
+  server.close((err) => {
+    if (err) console.error('[shutdown] server.close error', err)
+    pool.end().catch((e) => console.error('[shutdown] pool.end error', e)).finally(() => {
+      console.log('[shutdown] done')
+      process.exit(0)
+    })
+  })
+  // Force exit if drain takes too long
+  setTimeout(() => {
+    console.error('[shutdown] drain timeout, forcing exit')
+    process.exit(1)
+  }, 10_000).unref()
+}
+process.on('SIGTERM', () => shutdown('SIGTERM'))
+process.on('SIGINT', () => shutdown('SIGINT'))

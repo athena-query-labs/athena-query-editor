@@ -11,6 +11,10 @@ The backend must enforce per-user isolation and attribution for query history, m
 
 Require every request to include an `X-Email` header via shared middleware. Requests without it return HTTP 401.
 
+### Exception: `GET /health`
+
+`/health` is registered before the `requireUser` middleware and accepts unauthenticated requests. Orchestrator probes (Docker `HEALTHCHECK`, Kubernetes liveness/readiness, load balancer pings) need to verify process liveness without injecting an end-user identity header. The endpoint returns only `{ ok: true }` and has no side effects.
+
 ## Key Drivers
 
 - Enforce user-level isolation in query history and auditing.

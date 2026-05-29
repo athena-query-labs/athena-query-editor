@@ -5,8 +5,12 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
-  # Maintain dependencies for npm
+  # npm — repo has two workspaces, each with its own package.json
   - package-ecosystem: "npm"
-    directory: "/"
+    directory: "/precise"
+    schedule:
+      interval: "weekly"
+  - package-ecosystem: "npm"
+    directory: "/server"
     schedule:
       interval: "weekly"
