@@ -14,6 +14,7 @@ Backend
 - ADR-0008: Format query metrics and estimate cost in the API (`0008-format-metrics-and-estimate-cost.md`)
 - ADR-0010: Upsert query history by user and execution ID (`0010-upsert-query-history-by-user-and-execution-id.md`)
 - ADR-0012: Translate AWS errors to HTTP status codes and mask sensitive details (`0012-translate-aws-errors-to-http-status-codes.md`)
+- ADR-0013: Multi-catalog metadata support on the server (`0013-multi-catalog-metadata-support.md`)
 
 Frontend
 - ADR-0006: Use Vite proxy to inject X-Email in local dev (`0006-vite-proxy-injects-x-email.md`)

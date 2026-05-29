@@ -152,8 +152,20 @@ export function createQueryRouter(
       const rows = result.ResultSet?.Rows ?? []
       const columns = result.ResultSet?.ResultSetMetadata?.ColumnInfo ?? []
 
-      const dataRows = rows.length > 0 && !query.nextToken ? rows.slice(1) : rows
-      const values = dataRows.map((row) => (row.Data ?? []).map((cell) => cell.VarCharValue ?? ''))
+      // Athena prepends a header row to DML (SELECT/INSERT/CTAS) results
+      // on the first page, but DDL and UTILITY (SHOW/DESCRIBE) results have
+      // no header. Look up the StatementType to decide whether to skip.
+      let skipHeader = false
+      if (!query.nextToken && rows.length > 0) {
+        const exec = await athena.send(
+          new GetQueryExecutionCommand({ QueryExecutionId: req.params.id })
+        )
+        skipHeader = (exec.QueryExecution?.StatementType ?? 'DML') === 'DML'
+      }
+      const dataRows = skipHeader ? rows.slice(1) : rows
+      const values = dataRows.map((row) =>
+        (row.Data ?? []).map((cell) => cell.VarCharValue ?? null)
+      )
 
       res.json({
         columns: columns.map((col) => ({

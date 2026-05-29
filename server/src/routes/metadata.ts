@@ -1,5 +1,11 @@
 import { Router } from 'express'
-import { AthenaClient, ListDatabasesCommand, ListTableMetadataCommand, GetTableMetadataCommand } from '@aws-sdk/client-athena'
+import {
+  AthenaClient,
+  ListDataCatalogsCommand,
+  ListDatabasesCommand,
+  ListTableMetadataCommand,
+  GetTableMetadataCommand,
+} from '@aws-sdk/client-athena'
 import { AppConfig } from '../config.js'
 
 export function createMetadataRouter(config: AppConfig, athena: AthenaClient) {
@@ -7,20 +13,37 @@ export function createMetadataRouter(config: AppConfig, athena: AthenaClient) {
 
   router.get('/catalogs', async (_req, res, next) => {
     try {
-      res.json({ catalogs: [config.defaultCatalog] })
+      const catalogs: string[] = []
+      let nextToken: string | undefined
+      do {
+        const result = await athena.send(
+          new ListDataCatalogsCommand({
+            WorkGroup: config.workgroup,
+            NextToken: nextToken,
+          })
+        )
+        catalogs.push(
+          ...(result.DataCatalogsSummary ?? [])
+            .map((c) => c.CatalogName)
+            .filter((name): name is string => Boolean(name))
+        )
+        nextToken = result.NextToken
+      } while (nextToken)
+      res.json({ catalogs })
     } catch (err) {
       next(err)
     }
   })
 
-  router.get('/databases', async (_req, res, next) => {
+  router.get('/databases', async (req, res, next) => {
     try {
+      const catalog = String(req.query.catalog || '') || config.defaultCatalog
       const databases: string[] = []
       let nextToken: string | undefined
       do {
         const result = await athena.send(
           new ListDatabasesCommand({
-            CatalogName: config.defaultCatalog,
+            CatalogName: catalog,
             NextToken: nextToken,
           })
         )
@@ -39,6 +62,7 @@ export function createMetadataRouter(config: AppConfig, athena: AthenaClient) {
 
   router.get('/tables', async (req, res, next) => {
     try {
+      const catalog = String(req.query.catalog || '') || config.defaultCatalog
       const database = String(req.query.database || '')
       if (!database) {
         res.status(400).json({ error: 'database is required' })
@@ -49,7 +73,7 @@ export function createMetadataRouter(config: AppConfig, athena: AthenaClient) {
       do {
         const result = await athena.send(
           new ListTableMetadataCommand({
-            CatalogName: config.defaultCatalog,
+            CatalogName: catalog,
             DatabaseName: database,
             MaxResults: 50,
             NextToken: nextToken,
@@ -74,6 +98,7 @@ export function createMetadataRouter(config: AppConfig, athena: AthenaClient) {
 
   router.get('/columns', async (req, res, next) => {
     try {
+      const catalog = String(req.query.catalog || '') || config.defaultCatalog
       const database = String(req.query.database || '')
       const table = String(req.query.table || '')
       if (!database || !table) {
@@ -82,7 +107,7 @@ export function createMetadataRouter(config: AppConfig, athena: AthenaClient) {
       }
       const result = await athena.send(
         new GetTableMetadataCommand({
-          CatalogName: config.defaultCatalog,
+          CatalogName: catalog,
           DatabaseName: database,
           TableName: table,
         })
