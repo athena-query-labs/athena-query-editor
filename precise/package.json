@@ -54,6 +54,7 @@
     "@mui/x-tree-view": "^8.13.1",
     "antlr4-c3": "^3.4.4",
     "antlr4ng": "^3.0.16",
+    "monaco-editor": "^0.55.1",
     "sql-formatter": "^15.6.9",
     "uuidv4": "^6.2.13"
   },

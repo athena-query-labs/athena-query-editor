@@ -3,7 +3,11 @@ import ReactDOM from 'react-dom/client'
 import { Stack, Switch, Tooltip } from '@mui/material'
 import Brightness4OutlinedIcon from '@mui/icons-material/Brightness4Outlined'
 import Brightness7OutlinedIcon from '@mui/icons-material/Brightness7Outlined'
+import { loader } from '@monaco-editor/react'
 import QueryEditor from './QueryEditor'
+import * as monaco from './monaco'
+
+loader.config({ monaco })
 
 function useObservedHeight<T extends HTMLElement>(ref: React.RefObject<T> | React.RefObject<T | null>) {
     const [height, setHeight] = useState(0)
