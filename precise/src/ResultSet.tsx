@@ -332,7 +332,7 @@ class ResultSet extends React.Component<ResultSetProps, ResultSetState> {
         // Ensure the 'result-set' class is applied to the container
         return (
             <Box>
-                <Box display="flex" alignItems="center" gap={1} fontSize="0.8rem" sx={{ p: 1 }}>
+                <Box sx={{ p: 1, display: 'flex', alignItems: 'center', gap: 1, fontSize: '0.8rem' }}>
                     {errorMessage ? (
                         <Alert severity="error" sx={{ py: 0 }}>
                             {errorMessage}

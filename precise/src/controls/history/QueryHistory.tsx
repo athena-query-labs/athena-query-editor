@@ -374,7 +374,7 @@ const QueryHistory: React.FC<QueryHistoryProps> = ({ onSelectQuery, onDrawerTogg
                                         </Tooltip>
                                     </Box>
                                 }
-                                primaryTypographyProps={{ component: 'div' }}
+                                slotProps={{ primary: { component: 'div' } }}
                             />
                         </ListItem>
                         <Divider

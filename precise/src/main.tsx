@@ -85,7 +85,7 @@ export default function App() {
                 >
                     Athena Query Editor
                 </h1>
-                <Stack direction="row" spacing={0.5} alignItems="center">
+                <Stack direction="row" spacing={0.5} sx={{ alignItems: 'center' }}>
                     {themeMode === 'dark' ? (
                         <Brightness4OutlinedIcon fontSize="small" />
                     ) : (
@@ -96,7 +96,7 @@ export default function App() {
                             size="small"
                             checked={themeMode === 'dark'}
                             onChange={toggleTheme}
-                            inputProps={{ 'aria-label': 'Theme toggle' }}
+                            slotProps={{ input: { 'aria-label': 'Theme toggle' } }}
                         />
                     </Tooltip>
                 </Stack>

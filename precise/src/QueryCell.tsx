@@ -298,8 +298,8 @@ class QueryCell extends React.Component<QueryCellProps, QueryCellState> {
                             flexWrap: 'wrap',
                             columnGap: 12,
                             rowGap: 0,
+                            alignItems: 'baseline',
                         }}
-                        alignItems="baseline"
                     >
                         <Stack direction="row" spacing={1}>
                             <Box component="span" sx={{ fontWeight: 600, color: 'text.secondary', mr: 0.5 }}>

@@ -80,8 +80,8 @@ const CatalogViewerSchema: React.FC<SchemaProps> = ({
                     }}
                 >
                     <Typography
-                        fontSize="small"
                         sx={{
+                            fontSize: 'small',
                             fontWeight: isActive ? 600 : 400,
                             color: isActive ? 'primary.main' : 'inherit',
                         }}
@@ -113,7 +113,7 @@ const CatalogViewerSchema: React.FC<SchemaProps> = ({
                     itemId={`${schemaPath}.__error`}
                     label={
                         <Tooltip title={schemaError}>
-                            <Typography fontSize="small" color="error.main">
+                            <Typography sx={{ fontSize: 'small', color: 'error.main' }}>
                                 Failed to load tables
                             </Typography>
                         </Tooltip>
@@ -123,16 +123,14 @@ const CatalogViewerSchema: React.FC<SchemaProps> = ({
                 <TreeItem
                     itemId={`${schemaPath}.__loading`}
                     label={
-                        <Typography fontSize="small" color="text.secondary">
-                            Loading tables...
-                        </Typography>
+                        <Typography sx={{ fontSize: 'small', color: 'text.secondary' }}>Loading tables...</Typography>
                     }
                 />
             ) : tables.length === 0 ? (
                 <TreeItem
                     itemId={`${schemaPath}.__empty`}
                     label={
-                        <Typography fontSize="small" color="text.secondary">
+                        <Typography sx={{ fontSize: 'small', color: 'text.secondary' }}>
                             {isSchemaLoaded ? 'No tables found' : 'Click to load tables'}
                         </Typography>
                     }
